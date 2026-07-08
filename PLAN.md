@@ -56,19 +56,33 @@ xDeviruchi, Leohpaz) under their own licenses — they are NOT ours to ship.
       `src/config.js`) and remove the GitHub/YouTube links in `title-scene.js`.
 - [ ] Replace title art in `public/assets/images/monster-tamer/ui/title/`.
 
-### 2. Swap the battle system → QuizMon quiz battle  *(the core change)*
-The overworld triggers a battle via an **encounter**. Today that starts
-`BattleScene`. We want it to start a **quiz battle** instead.
-- [ ] Extract the quiz battle logic/UI from `legacy/quizmon-arena.html` into a
-      new `QuizBattleScene` (or a DOM overlay launched from a thin scene).
-- [ ] Find where encounters launch the battle: `src/scenes/world-scene.js`
-      (search for `BATTLE_SCENE` / `startEncounter`) and route to the quiz battle.
-- [ ] Decide the data bridge: the overworld passes the encountered monster +
-      player party into the quiz battle; the quiz battle returns the result
-      (win/lose/caught, XP) back to the world scene. Reuse Monster Tamer's
-      scene-data pattern (`this.scene.start(KEY, data)` + resume events).
-- [ ] Keep or replace Monster Tamer's monster data (`public/assets/data/monsters.json`,
-      `encounters.json`) with QuizMon's monsters and question pools.
+### 2. Quiz-driven battles  *(the core change — DONE, v1)*
+The quiz concept is built **into** the existing overworld encounter → battle
+flow, rather than as a separate screen. When the player chooses **Fight** and a
+move, a quiz question must be answered to land the attack. This keeps every
+Monster Tamer system (switch / item / flee / catch / exp) intact.
+
+Implemented:
+- [x] Question bank ported from `legacy/quizmon-arena.html` →
+      `public/assets/data/questions.json` (loaded via `DataUtils.getQuestions`).
+- [x] `src/battle/quiz/quiz-manager.js` — question selection (difficulty scales
+      with monster level), streak tracking, and damage scaling (streak + answer
+      speed).
+- [x] `src/battle/quiz/quiz-ui.js` — Phaser panel: question, 2×2 options
+      (joystick/arrow navigable **and** tappable), countdown bar, correct/wrong
+      feedback.
+- [x] `src/scenes/battle-scene.js` — new `PLAYER_QUIZ` battle state: choosing an
+      attack routes to the quiz; a correct answer powers `#playerAttack` (damage
+      = `baseAttack × multiplier`), a wrong answer / timeout makes it fizzle and
+      the enemy still strikes.
+
+Follow-ups / tuning:
+- [ ] Tie question **category to the overworld area** (e.g. a "Math" route) —
+      `pickQuestion({ category })` already supports it; wire area → category.
+- [ ] Tune timer (15s), streak/speed multipliers in `quiz-manager.js`.
+- [ ] Optional: port the legacy **energy/cards** layer for extra depth.
+- [ ] Replace Monster Tamer's monsters (`public/assets/data/monsters.json`,
+      `encounters.json`) with QuizMon's own roster.
 
 ### 3. Make the world ours
 - [ ] Edit maps in [Tiled](https://www.mapeditor.org/); tilemaps are

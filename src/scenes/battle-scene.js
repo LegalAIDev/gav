@@ -22,6 +22,8 @@ import { sleep } from '../utils/time-utils.js';
 import { generateUuid } from '../utils/random.js';
 import { calculateMonsterCaptureResults } from '../utils/catch-utils.js';
 import { EnemyBattleNpc } from '../battle/enemy-battle-npc.js';
+import { QuizManager } from '../battle/quiz/quiz-manager.js';
+import { QuizUI } from '../battle/quiz/quiz-ui.js';
 
 const BATTLE_STATES = Object.freeze({
   INTRO: 'INTRO',
@@ -29,6 +31,7 @@ const BATTLE_STATES = Object.freeze({
   PRE_BATTLE_INFO_NPC: 'PRE_BATTLE_INFO_NPC',
   BRING_OUT_MONSTER: 'BRING_OUT_MONSTER',
   PLAYER_INPUT: 'PLAYER_INPUT',
+  PLAYER_QUIZ: 'PLAYER_QUIZ',
   ENEMY_INPUT: 'ENEMY_INPUT',
   BATTLE: 'BATTLE',
   POST_ATTACK_CHECK: 'POST_ATTACK_CHECK',
@@ -106,6 +109,22 @@ export class BattleScene extends BaseScene {
   #availableMonstersUiContainerForNpc;
   /** @type {EnemyBattleNpc | undefined} */
   #enemyBattleNpc;
+  /** @type {QuizManager} */
+  #quizManager;
+  /** @type {QuizUI} */
+  #quizUi;
+  /** @type {import('../battle/quiz/quiz-manager.js').QuizQuestion | undefined} */
+  #currentQuestion;
+  /** @type {import('../battle/quiz/quiz-manager.js').QuizResult | undefined} the pending result that gates the player's attack */
+  #quizOutcome;
+  /** @type {boolean} */
+  #quizAwaitingAnswer;
+  /** @type {Phaser.Time.TimerEvent | undefined} */
+  #quizTimerEvent;
+  /** @type {number} */
+  #quizTimeLeft;
+  /** @type {number} */
+  #quizTimeMax;
 
   constructor() {
     super({
@@ -187,6 +206,8 @@ export class BattleScene extends BaseScene {
 
     // render out the main info and sub info panes
     this.#battleMenu = new BattleMenu(this, this.#activePlayerMonster, this.#skipAnimations, this.#isTrainerBattle);
+    this.#quizManager = new QuizManager(this);
+    this.#quizUi = new QuizUI(this);
     this.#createBattleStateMachine();
     this.#attackManager = new AttackManager(this, this.#skipAnimations);
     this.#createAvailableMonstersUi();
@@ -233,6 +254,23 @@ export class BattleScene extends BaseScene {
       this.#battleMenu.handlePlayerInput('OK');
       return;
     }
+    // quiz challenge: the player's turn is gated on answering a question.
+    // Confirm submits the highlighted option; the joystick/arrows move the
+    // cursor; tapping an option resolves directly via the QuizUI callback.
+    if (this.#battleStateMachine.currentStateName === BATTLE_STATES.PLAYER_QUIZ) {
+      if (this.#quizAwaitingAnswer) {
+        if (wasSpaceKeyPressed) {
+          this.#submitQuizAnswer(this.#quizUi.selectedIndex);
+        } else {
+          const quizDirection = this._controls.getDirectionKeyJustPressed();
+          if (quizDirection !== DIRECTION.NONE) {
+            this.#quizUi.moveCursor(quizDirection);
+          }
+        }
+      }
+      return;
+    }
+
     if (this.#battleStateMachine.currentStateName !== BATTLE_STATES.PLAYER_INPUT) {
       return;
     }
@@ -272,7 +310,7 @@ export class BattleScene extends BaseScene {
         `Player selected the following move: ${this.#activePlayerMonster.attacks[this.#activePlayerAttackIndex].name}`
       );
       this.#battleMenu.hideMonsterAttackSubMenu();
-      this.#battleStateMachine.setState(BATTLE_STATES.ENEMY_INPUT);
+      this.#battleStateMachine.setState(BATTLE_STATES.PLAYER_QUIZ);
       return;
     }
 
@@ -297,8 +335,26 @@ export class BattleScene extends BaseScene {
       return;
     }
 
+    // a wrong answer / timeout makes the attack fizzle and deal no damage
+    if (this.#quizOutcome && !this.#quizOutcome.correct) {
+      this.#battleMenu.updateInfoPaneMessageNoInputRequired(
+        `${this.#activePlayerMonster.name} lost focus and the attack missed!`,
+        () => {
+          this.time.delayedCall(700, () => {
+            callback();
+          });
+        }
+      );
+      return;
+    }
+
+    // damage is scaled by the quiz result (streak + answer speed); fall back to
+    // the base attack stat if no quiz was answered (defensive).
+    const damage = this.#quizOutcome ? this.#quizOutcome.damage : this.#activePlayerMonster.baseAttack;
+    const bonusText = this.#quizOutcome && this.#quizOutcome.multiplier >= 1.6 ? ' A powerful hit!' : '';
+
     this.#battleMenu.updateInfoPaneMessageNoInputRequired(
-      `${this.#activePlayerMonster.name} used ${this.#activePlayerMonster.attacks[this.#activePlayerAttackIndex].name}`,
+      `${this.#activePlayerMonster.name} used ${this.#activePlayerMonster.attacks[this.#activePlayerAttackIndex].name}!${bonusText}`,
       () => {
         // play attack animation based on the selected attack
         // when attack is finished, play damage animation and then update health bar
@@ -311,7 +367,7 @@ export class BattleScene extends BaseScene {
             ATTACK_TARGET.ENEMY,
             () => {
               this.#activeEnemyMonster.playTakeDamageAnimation(() => {
-                this.#activeEnemyMonster.takeDamage(this.#activePlayerMonster.baseAttack, () => {
+                this.#activeEnemyMonster.takeDamage(damage, () => {
                   callback();
                 });
               });
@@ -320,6 +376,67 @@ export class BattleScene extends BaseScene {
         });
       }
     );
+  }
+
+  /**
+   * Start (or restart) the per-question countdown. Running out of time counts
+   * as a wrong answer.
+   * @returns {void}
+   */
+  #startQuizTimer() {
+    this.#quizTimeMax = 15;
+    this.#quizTimeLeft = this.#quizTimeMax;
+    this.#stopQuizTimer();
+    this.#quizUi.setTimerFraction(1);
+    this.#quizTimerEvent = this.time.addEvent({
+      delay: 100,
+      loop: true,
+      callback: () => {
+        this.#quizTimeLeft = Math.max(0, this.#quizTimeLeft - 0.1);
+        this.#quizUi.setTimerFraction(this.#quizTimeLeft / this.#quizTimeMax);
+        if (this.#quizTimeLeft <= 0) {
+          this.#submitQuizAnswer(-1);
+        }
+      },
+    });
+  }
+
+  /** @returns {void} */
+  #stopQuizTimer() {
+    if (this.#quizTimerEvent) {
+      this.#quizTimerEvent.remove(false);
+      this.#quizTimerEvent = undefined;
+    }
+  }
+
+  /**
+   * Resolve the chosen answer into a combat outcome, show feedback, then hand
+   * off to the normal battle sequence.
+   * @param {number} chosenIndex the option picked, or -1 on timeout
+   * @returns {void}
+   */
+  #submitQuizAnswer(chosenIndex) {
+    if (!this.#quizAwaitingAnswer) {
+      return;
+    }
+    this.#quizAwaitingAnswer = false;
+    this.#stopQuizTimer();
+
+    const timeFraction = this.#quizTimeMax > 0 ? this.#quizTimeLeft / this.#quizTimeMax : 0;
+    this.#quizOutcome = this.#quizManager.resolveAnswer({
+      question: this.#currentQuestion,
+      chosenIndex,
+      baseAttack: this.#activePlayerMonster.baseAttack,
+      timeFraction,
+    });
+
+    this.#quizUi.reveal(this.#quizOutcome.correctIndex, chosenIndex);
+
+    // brief pause so the player registers the correct/wrong highlight
+    this.time.delayedCall(900, () => {
+      this.#quizUi.hide();
+      this.#battleStateMachine.setState(BATTLE_STATES.ENEMY_INPUT);
+    });
   }
 
   /**
@@ -567,6 +684,23 @@ export class BattleScene extends BaseScene {
       onEnter: () => {
         this._controls.lockInput = false;
         this.#battleMenu.showMainBattleMenu();
+      },
+    });
+
+    // The player has committed to attacking with the selected move; they must
+    // now answer a quiz question to land it. A correct answer powers the attack
+    // (streak + speed bonus); a wrong answer or timeout makes it fizzle.
+    this.#battleStateMachine.addState({
+      name: BATTLE_STATES.PLAYER_QUIZ,
+      onEnter: () => {
+        this._controls.lockInput = false;
+        this.#battleMenu.hideMainBattleMenu();
+        this.#currentQuestion = this.#quizManager.pickQuestion({ level: this.#activePlayerMonster.level });
+        this.#quizAwaitingAnswer = true;
+        this.#quizUi.show(this.#currentQuestion, { streak: this.#quizManager.streak }, (index) =>
+          this.#submitQuizAnswer(index)
+        );
+        this.#startQuizTimer();
       },
     });
 

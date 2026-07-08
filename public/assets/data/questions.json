@@ -1,0 +1,43 @@
+[
+  { "category": "Vocabulary", "difficulty": 1, "question": "Which word means very surprised?", "answers": ["Scarce", "Astonished", "Tiny", "Careless"], "correct": 1 },
+  { "category": "Vocabulary", "difficulty": 1, "question": "What is a synonym for rapid?", "answers": ["Fast", "Quiet", "Weak", "Careful"], "correct": 0 },
+  { "category": "Vocabulary", "difficulty": 2, "question": "What is an antonym of scarce?", "answers": ["Rare", "Abundant", "Small", "Hidden"], "correct": 1 },
+  { "category": "Vocabulary", "difficulty": 2, "question": "Which word means using few words?", "answers": ["Brief", "Ancient", "Furious", "Fragile"], "correct": 0 },
+  { "category": "Vocabulary", "difficulty": 2, "question": "The prefix bio- means:", "answers": ["Sound", "Life", "Earth", "Water"], "correct": 1 },
+  { "category": "Vocabulary", "difficulty": 1, "question": "What does predict mean?", "answers": ["Guess before", "Erase", "Measure", "Run quickly"], "correct": 0 },
+  { "category": "Vocabulary", "difficulty": 1, "question": "Which word means make better?", "answers": ["Ignore", "Improve", "Scatter", "Delay"], "correct": 1 },
+  { "category": "Vocabulary", "difficulty": 1, "question": "What is a synonym for brave?", "answers": ["Timid", "Dull", "Courageous", "Careless"], "correct": 2 },
+  { "category": "Vocabulary", "difficulty": 3, "question": "'Benevolent' most nearly means:", "answers": ["Kind", "Hostile", "Confused", "Wealthy"], "correct": 0 },
+  { "category": "Vocabulary", "difficulty": 3, "question": "An antonym of 'ancient' is:", "answers": ["Old", "Modern", "Fragile", "Wise"], "correct": 1 },
+  { "category": "Vocabulary", "difficulty": 2, "question": "The root 'aqua' relates to:", "answers": ["Fire", "Air", "Water", "Stone"], "correct": 2 },
+  { "category": "Vocabulary", "difficulty": 3, "question": "'Meticulous' describes someone who is:", "answers": ["Careless", "Very careful", "Loud", "Lazy"], "correct": 1 },
+
+  { "category": "Math", "difficulty": 1, "question": "What is 8 x 7?", "answers": ["54", "56", "63", "49"], "correct": 1 },
+  { "category": "Math", "difficulty": 1, "question": "What is 45 / 5?", "answers": ["7", "8", "9", "10"], "correct": 2 },
+  { "category": "Math", "difficulty": 2, "question": "What is 12 x 12?", "answers": ["124", "132", "144", "154"], "correct": 2 },
+  { "category": "Math", "difficulty": 2, "question": "What is 15% of 200?", "answers": ["20", "25", "30", "35"], "correct": 2 },
+  { "category": "Math", "difficulty": 2, "question": "What is 7 squared?", "answers": ["42", "49", "56", "64"], "correct": 1 },
+  { "category": "Math", "difficulty": 3, "question": "Solve: 3x = 21, x = ?", "answers": ["6", "7", "8", "9"], "correct": 1 },
+  { "category": "Math", "difficulty": 1, "question": "What is 100 - 37?", "answers": ["63", "67", "73", "57"], "correct": 0 },
+  { "category": "Math", "difficulty": 3, "question": "Area of a triangle, base 10 height 6?", "answers": ["30", "60", "16", "36"], "correct": 0 },
+
+  { "category": "Science", "difficulty": 1, "question": "Which planet is called the Red Planet?", "answers": ["Venus", "Mars", "Jupiter", "Mercury"], "correct": 1 },
+  { "category": "Science", "difficulty": 1, "question": "Plants make food using:", "answers": ["Photosynthesis", "Magnetism", "Friction", "Evaporation"], "correct": 0 },
+  { "category": "Science", "difficulty": 2, "question": "H2O is the formula for:", "answers": ["Salt", "Water", "Oxygen", "Sugar"], "correct": 1 },
+  { "category": "Science", "difficulty": 2, "question": "What gas do humans breathe in to survive?", "answers": ["Nitrogen", "Hydrogen", "Oxygen", "Helium"], "correct": 2 },
+  { "category": "Science", "difficulty": 3, "question": "The powerhouse of the cell is the:", "answers": ["Nucleus", "Ribosome", "Mitochondrion", "Membrane"], "correct": 2 },
+  { "category": "Science", "difficulty": 2, "question": "How many bones in the adult human body?", "answers": ["206", "201", "210", "190"], "correct": 0 },
+  { "category": "Science", "difficulty": 3, "question": "Speed of light is about:", "answers": ["300 km/s", "3,000 km/s", "300,000 km/s", "30 km/s"], "correct": 2 },
+
+  { "category": "History", "difficulty": 1, "question": "Who was the first U.S. President?", "answers": ["Lincoln", "Washington", "Jefferson", "Adams"], "correct": 1 },
+  { "category": "History", "difficulty": 2, "question": "The Great Wall is found in:", "answers": ["India", "China", "Egypt", "Peru"], "correct": 1 },
+  { "category": "History", "difficulty": 2, "question": "Ancient pyramids at Giza were built by the:", "answers": ["Romans", "Greeks", "Egyptians", "Aztecs"], "correct": 2 },
+  { "category": "History", "difficulty": 3, "question": "In what year did WWII end?", "answers": ["1943", "1945", "1948", "1950"], "correct": 1 },
+
+  { "category": "Geography", "difficulty": 1, "question": "What is the capital of France?", "answers": ["Rome", "Paris", "Madrid", "Berlin"], "correct": 1 },
+  { "category": "Geography", "difficulty": 1, "question": "Largest ocean on Earth?", "answers": ["Atlantic", "Indian", "Pacific", "Arctic"], "correct": 2 },
+  { "category": "Geography", "difficulty": 2, "question": "Which country has the most people?", "answers": ["USA", "India", "Russia", "Brazil"], "correct": 1 },
+  { "category": "Geography", "difficulty": 2, "question": "The Sahara Desert is on which continent?", "answers": ["Asia", "Africa", "Australia", "Europe"], "correct": 1 },
+  { "category": "Geography", "difficulty": 3, "question": "The longest river in the world is the:", "answers": ["Amazon", "Nile", "Yangtze", "Mississippi"], "correct": 1 },
+  { "category": "Geography", "difficulty": 1, "question": "Mount Everest is the tallest:", "answers": ["Volcano", "Mountain", "Waterfall", "Plateau"], "correct": 1 }
+]

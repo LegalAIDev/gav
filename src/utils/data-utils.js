@@ -108,4 +108,15 @@ export class DataUtils {
     const data = scene.cache.json.get(DATA_ASSET_KEYS.SIGNS);
     return data[signId];
   }
+
+  /**
+   * Utility function for retrieving the quiz question bank from questions.json.
+   * @param {Phaser.Scene} scene the Phaser 3 Scene to get cached JSON file from
+   * @returns {import('../battle/quiz/quiz-manager.js').QuizQuestion[]}
+   */
+  static getQuestions(scene) {
+    /** @type {import('../battle/quiz/quiz-manager.js').QuizQuestion[]} */
+    const data = scene.cache.json.get(DATA_ASSET_KEYS.QUESTIONS);
+    return data;
+  }
 }
