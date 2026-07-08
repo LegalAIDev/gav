@@ -5,14 +5,15 @@
     "name": "Noxini",
     "assetKey": "NOXINI",
     "assetFrame": 0,
-    "currentHp": 25,
-    "maxHp": 25,
+    "currentHp": 60,
+    "maxHp": 60,
     "attackIds": [
+      2,
       1
     ],
-    "baseAttack": 5,
-    "currentAttack": 5,
-    "currentLevel": 5,
+    "baseAttack": 10,
+    "currentAttack": 10,
+    "currentLevel": 8,
     "baseExp": 51,
     "currentExp": 125
   },

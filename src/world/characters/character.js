@@ -61,6 +61,8 @@ export class Character {
   _spriteGridMovementStartedCallback;
   /** @protected @type {boolean} */
   _isRunning;
+  /** @protected @type {number} duration in ms for a single walking step (per tile) */
+  _walkDuration;
 
   /**
    * @param {CharacterConfig} config
@@ -74,6 +76,7 @@ export class Character {
     this._direction = config.direction;
     this._isMoving = false;
     this._isRunning = false;
+    this._walkDuration = 600;
     this._targetPosition = { ...config.position };
     this._previousTargetPosition = { ...config.position };
     this._idleFrameConfig = config.idleFrameConfig;
@@ -224,7 +227,7 @@ export class Character {
 
     this._scene.add.tween({
       delay: 0,
-      duration: this._isRunning ? 300 : 600,
+      duration: this._isRunning ? 300 : this._walkDuration,
       y: {
         from: this._phaserGameObject.y,
         start: this._phaserGameObject.y,
