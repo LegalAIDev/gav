@@ -2,10 +2,18 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>QuizMon Arena Prototype</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#06121f" />
+<title>QuizMon Arena</title>
 <style>
   * { box-sizing: border-box; }
+
+  :root {
+    --panel: rgba(7, 18, 34, .75);
+    --line: rgba(255,255,255,.14);
+  }
+
+  html, body { height: 100%; }
 
   body {
     margin: 0;
@@ -15,6 +23,7 @@
       linear-gradient(180deg, #102642, #06121f);
     color: white;
     overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
   }
 
   button {
@@ -26,10 +35,13 @@
     color: white;
     background: linear-gradient(180deg, #3a86ff, #1d4fa3);
     box-shadow: 0 4px 0 rgba(0,0,0,.35);
+    transition: transform .05s ease, filter .12s ease;
+    font-family: inherit;
   }
 
   button:hover { filter: brightness(1.1); }
-  button:disabled { opacity: .5; cursor: not-allowed; }
+  button:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,.35); }
+  button:disabled { opacity: .45; cursor: not-allowed; filter: none; }
 
   .screen {
     display: none;
@@ -54,16 +66,19 @@
     background:
       linear-gradient(135deg, transparent 0 58%, rgba(20, 75, 70, .8) 59% 64%, transparent 65%) 0 250px / 330px 140px repeat-x,
       linear-gradient(45deg, transparent 0 58%, rgba(18, 92, 55, .8) 59% 64%, transparent 65%) 80px 300px / 380px 170px repeat-x;
+    animation: drift 40s linear infinite;
   }
+
+  @keyframes drift { to { background-position: 330px 250px, 460px 300px; } }
 
   .menu-card {
     position: relative;
     z-index: 1;
-    width: min(900px, calc(100vw - 32px));
-    margin: 7vh auto;
+    width: min(920px, calc(100vw - 32px));
+    margin: 6vh auto;
     padding: 28px;
     border-radius: 28px;
-    background: rgba(7, 18, 34, .75);
+    background: rgba(7, 18, 34, .78);
     border: 1px solid rgba(255,255,255,.25);
     backdrop-filter: blur(8px);
     box-shadow: 0 30px 80px rgba(0,0,0,.35);
@@ -74,22 +89,24 @@
 
   h1 {
     margin: 0;
-    font-size: clamp(48px, 9vw, 92px);
+    font-size: clamp(46px, 9vw, 90px);
     line-height: .9;
     letter-spacing: -5px;
     text-shadow: 0 8px 0 rgba(0,0,0,.25);
   }
 
+  h1 .accent { color: #ffd166; }
+
   .subtitle {
     color: #d9efff;
-    font-size: 18px;
+    font-size: 17px;
     line-height: 1.5;
-    margin-top: 18px;
+    margin-top: 16px;
   }
 
   .scene {
-    height: 230px;
-    margin-top: 24px;
+    height: 210px;
+    margin-top: 20px;
     border-radius: 22px;
     border: 1px solid rgba(255,255,255,.25);
     overflow: hidden;
@@ -112,6 +129,21 @@
     border: 4px solid rgba(0,0,0,.25);
   }
 
+  .scene .roamer {
+    position: absolute;
+    bottom: 30px;
+    font-size: 40px;
+    animation: roam 9s ease-in-out infinite;
+  }
+
+  @keyframes roam {
+    0%   { left: 6%;  transform: scaleX(1); }
+    45%  { left: 78%; transform: scaleX(1); }
+    50%  { left: 78%; transform: scaleX(-1); }
+    95%  { left: 6%;  transform: scaleX(-1); }
+    100% { left: 6%;  transform: scaleX(1); }
+  }
+
   .menu-buttons {
     display: grid;
     gap: 12px;
@@ -119,13 +151,12 @@
   }
 
   .green { background: linear-gradient(180deg, #51cf66, #259447); }
-  .gold { background: linear-gradient(180deg, #ffd166, #c87b22); }
+  .gold { background: linear-gradient(180deg, #ffd166, #c87b22); color:#20160a; }
   .purple { background: linear-gradient(180deg, #a66cff, #6935c8); }
   .red { background: linear-gradient(180deg, #ff6868, #b63434); }
   .ghost { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2); }
 
-  #starter {
-    padding: 26px;
+  #starter { padding: 26px; overflow:auto;
     background:
       radial-gradient(circle at top, rgba(255,210,100,.18), transparent 35%),
       linear-gradient(180deg, #102642, #081522);
@@ -161,35 +192,29 @@
     padding: 18px;
     text-align: center;
     cursor: pointer;
+    transition: transform .12s ease, border-color .12s ease;
   }
 
-  .starter-card:hover {
-    transform: translateY(-4px);
-    border-color: #ffd166;
-  }
+  .starter-card:hover { transform: translateY(-4px); border-color: #ffd166; }
 
-  .monster {
-    font-size: 70px;
-    filter: drop-shadow(0 10px 0 rgba(0,0,0,.25));
-  }
+  .monster { font-size: 70px; filter: drop-shadow(0 10px 0 rgba(0,0,0,.25)); }
 
-  .small {
-    color: #b9d3e8;
-    font-size: 14px;
-    line-height: 1.4;
-  }
+  .small { color: #b9d3e8; font-size: 14px; line-height: 1.4; }
 
-  #game {
-    display: none;
-    grid-template-rows: auto 1fr;
-    height: 100vh;
+  .badge-type {
+    display:inline-block; padding:3px 9px; border-radius:999px;
+    font-size:12px; font-weight:800; letter-spacing:.3px;
   }
+  .t-Fire   { background: linear-gradient(180deg,#ff7a45,#c23616); }
+  .t-Water  { background: linear-gradient(180deg,#43b6ff,#1d6fd1); }
+  .t-Nature { background: linear-gradient(180deg,#5bd66a,#238d3f); }
 
+  #game { display: none; grid-template-rows: auto 1fr; height: 100vh; }
   #game.active { display: grid; }
 
   .topbar {
-    padding: 12px 16px;
-    background: rgba(5, 14, 25, .9);
+    padding: 10px 14px;
+    background: rgba(5, 14, 25, .92);
     border-bottom: 1px solid rgba(255,255,255,.12);
     display: flex;
     justify-content: space-between;
@@ -197,41 +222,40 @@
     gap: 12px;
   }
 
-  .topbar strong {
-    font-size: 22px;
-  }
+  .topbar strong { font-size: 20px; }
 
-  .stats {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-  }
+  .stats { display: flex; gap: 7px; flex-wrap: wrap; justify-content: flex-end; align-items:center; }
 
   .pill {
-    padding: 7px 11px;
+    padding: 6px 10px;
     border-radius: 999px;
     background: rgba(255,255,255,.1);
     border: 1px solid rgba(255,255,255,.15);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 800;
+    white-space: nowrap;
   }
+  .pill.click { cursor: pointer; }
+  .pill.click:hover { background: rgba(255,255,255,.2); }
 
   .layout {
     display: grid;
-    grid-template-columns: 1fr 330px;
+    grid-template-columns: 1fr 340px;
     gap: 14px;
     padding: 14px;
     min-height: 0;
+    height: 100%;
   }
 
   .map-panel, .side-panel {
-    background: rgba(7, 18, 34, .75);
-    border: 1px solid rgba(255,255,255,.14);
+    background: var(--panel);
+    border: 1px solid var(--line);
     border-radius: 24px;
     padding: 14px;
     min-height: 0;
   }
+
+  .map-panel { position: relative; display:flex; flex-direction:column; }
 
   .location {
     display: flex;
@@ -253,12 +277,7 @@
     border-radius: 18px;
   }
 
-  .tile {
-    position: relative;
-    border-radius: 5px;
-    min-height: 42px;
-    image-rendering: pixelated;
-  }
+  .tile { position: relative; border-radius: 5px; min-height: 30px; image-rendering: pixelated; }
 
   .grass { background: #65b85f; }
   .path { background: #d2a85e; }
@@ -269,24 +288,30 @@
   .shop { background: linear-gradient(180deg, #e68a32 0 35%, #ffe0a1 36%); }
   .arena { background: linear-gradient(180deg, #bd4343 0 35%, #eee 36%); }
   .sign { background: #65b85f; }
-  .sign::after { content: "🪧"; position: absolute; inset: 0; display: grid; place-items: center; }
+  .sign::after { content: "🪧"; position: absolute; inset: 0; display: grid; place-items: center; font-size: 15px;}
   .flower { background: #65b85f; }
   .flower::after { content: "✿"; position: absolute; inset: 0; display: grid; place-items: center; color: #ffd1ff; }
+  .lab::after  { content:"🔬"; position:absolute; inset:0; display:grid; place-items:center; font-size:15px; }
+  .shop::after { content:"🛒"; position:absolute; inset:0; display:grid; place-items:center; font-size:15px; }
+  .arena::after{ content:"⚔️"; position:absolute; inset:0; display:grid; place-items:center; font-size:15px; }
 
   .player {
     position: absolute;
     inset: 0;
     display: grid;
     place-items: center;
-    font-size: 25px;
+    font-size: 22px;
     z-index: 2;
     filter: drop-shadow(0 5px 0 rgba(0,0,0,.35));
+    transition: transform .08s ease;
   }
+  .player.bump { transform: scale(1.15); }
 
   .side-panel {
     display: grid;
     gap: 12px;
-    grid-template-rows: auto auto auto 1fr;
+    grid-template-rows: auto auto auto auto 1fr;
+    overflow: auto;
   }
 
   .card {
@@ -296,38 +321,66 @@
     border: 1px solid rgba(255,255,255,.13);
   }
 
-  .card h3 { margin: 0 0 8px; }
+  .card h3 { margin: 0 0 8px; display:flex; justify-content:space-between; align-items:center; }
+  .card h3 .small { font-weight: 500; }
 
-  .actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
+  .party-row {
+    display:flex; align-items:center; gap:10px;
+    padding:8px; border-radius:12px; margin-bottom:6px;
+    background: rgba(255,255,255,.06);
+    border:1px solid transparent;
+    cursor:pointer;
   }
+  .party-row.active { border-color:#ffd166; background: rgba(255,209,102,.12); }
+  .party-row.fainted { opacity:.5; }
+  .party-emoji { font-size:30px; }
+  .party-info { flex:1; min-width:0; }
+  .party-info b { font-size:14px; }
+
+  .minibar { height:8px; border-radius:999px; background:rgba(0,0,0,.35); overflow:hidden; margin-top:4px; }
+  .minibar > div { height:100%; background:linear-gradient(90deg,#43d36b,#d2ff66); transition: width .3s ease; }
+
+  .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .actions.three { grid-template-columns: 1fr 1fr 1fr; }
 
   #log {
-    height: 150px;
+    height: 100%;
+    min-height: 90px;
     overflow: auto;
     background: rgba(0,0,0,.2);
     border-radius: 14px;
     padding: 10px;
     font-size: 13px;
   }
+  #log > div { padding: 2px 0; border-bottom: 1px dashed rgba(255,255,255,.06); }
 
-  .modal {
-    position: fixed;
-    inset: 0;
-    display: none;
-    place-items: center;
-    background: rgba(0,0,0,.72);
-    z-index: 10;
-    padding: 18px;
+  /* On-screen controls */
+  .touch-controls {
+    position: absolute;
+    left: 14px; bottom: 14px;
+    display: grid;
+    grid-template-columns: repeat(3, 46px);
+    grid-template-rows: repeat(3, 46px);
+    gap: 6px;
+    z-index: 5;
+    opacity: .92;
   }
+  .touch-controls button {
+    padding: 0; border-radius: 12px; font-size: 20px;
+    background: rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.2);
+    box-shadow: 0 3px 0 rgba(0,0,0,.3);
+  }
+  .dp-up { grid-area: 1 / 2; } .dp-left { grid-area: 2 / 1; }
+  .dp-act { grid-area: 2 / 2; background: linear-gradient(180deg,#ffd166,#c87b22)!important; color:#20160a; }
+  .dp-right { grid-area: 2 / 3; } .dp-down { grid-area: 3 / 2; }
 
+  /* Modals */
+  .modal { position: fixed; inset: 0; display: none; place-items: center; background: rgba(0,0,0,.75); z-index: 10; padding: 16px; }
   .modal.active { display: grid; }
 
   .modal-card {
     width: min(1050px, 100%);
-    max-height: 92vh;
+    max-height: 94vh;
     overflow: auto;
     padding: 20px;
     border-radius: 26px;
@@ -336,14 +389,10 @@
     box-shadow: 0 30px 90px rgba(0,0,0,.5);
   }
 
-  .battle-grid {
-    display: grid;
-    grid-template-columns: .95fr 1.05fr;
-    gap: 18px;
-  }
+  .battle-grid { display: grid; grid-template-columns: .95fr 1.05fr; gap: 18px; }
 
   .stage {
-    min-height: 420px;
+    min-height: 380px;
     border-radius: 22px;
     position: relative;
     overflow: hidden;
@@ -353,134 +402,136 @@
       linear-gradient(180deg, #83d5ff 0 48%, #6dc264 49%);
     border: 1px solid rgba(255,255,255,.16);
   }
-
-  .battle-monster {
-    position: absolute;
-    font-size: 92px;
-    filter: drop-shadow(0 14px 0 rgba(0,0,0,.28));
+  .stage.boss {
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(255,120,120,.4), transparent 40%),
+      linear-gradient(180deg, #3a2140 0 48%, #5a2740 49%);
+  }
+  .stage.shake { animation: shake .4s ease; }
+  @keyframes shake {
+    0%,100%{transform:translate(0,0)} 20%{transform:translate(-7px,3px)}
+    40%{transform:translate(6px,-4px)} 60%{transform:translate(-5px,-3px)} 80%{transform:translate(4px,4px)}
   }
 
-  #enemySprite { right: 70px; top: 90px; }
-  #playerSprite { left: 70px; bottom: 60px; }
+  .battle-monster { position: absolute; font-size: 84px; filter: drop-shadow(0 14px 0 rgba(0,0,0,.28)); transition: transform .12s ease; }
+  .battle-monster.hit { animation: hitflash .35s ease; }
+  @keyframes hitflash { 0%,100%{filter:drop-shadow(0 14px 0 rgba(0,0,0,.28));} 40%{filter:brightness(3) drop-shadow(0 0 10px #fff); transform:translateX(6px);} }
+  .battle-monster.attack-p { animation: lungeP .3s ease; }
+  .battle-monster.attack-e { animation: lungeE .3s ease; }
+  @keyframes lungeP { 50% { transform: translate(40px,-25px) scale(1.08); } }
+  @keyframes lungeE { 50% { transform: translate(-40px,25px) scale(1.08); } }
+
+  #enemySprite { right: 70px; top: 80px; }
+  #playerSprite { left: 70px; bottom: 55px; }
+
+  .float-num {
+    position: absolute;
+    font-weight: 900;
+    font-size: 26px;
+    text-shadow: 0 2px 4px rgba(0,0,0,.6);
+    pointer-events: none;
+    z-index: 6;
+    animation: floatUp 1s ease forwards;
+  }
+  @keyframes floatUp { 0%{opacity:1; transform:translateY(0) scale(.8);} 25%{transform:translateY(-10px) scale(1.2);} 100%{opacity:0; transform:translateY(-55px) scale(1);} }
 
   .hpbox {
     position: absolute;
-    background: rgba(7,18,34,.82);
+    background: rgba(7,18,34,.85);
     padding: 10px;
     border-radius: 16px;
     border: 1px solid rgba(255,255,255,.16);
     min-width: 210px;
   }
-
   .enemybox { right: 18px; top: 18px; }
   .playerbox { left: 18px; bottom: 18px; }
+  .hpbox .row { display:flex; justify-content:space-between; align-items:center; gap:8px; }
 
-  .bar {
-    height: 13px;
-    border-radius: 999px;
-    background: rgba(255,255,255,.15);
-    overflow: hidden;
-    margin-top: 7px;
-  }
+  .bar { height: 13px; border-radius: 999px; background: rgba(255,255,255,.15); overflow: hidden; margin-top: 7px; }
+  .fill { height: 100%; background: linear-gradient(90deg, #43d36b, #d2ff66); width: 100%; transition: width .4s ease; }
+  .fill.low { background: linear-gradient(90deg, #ff5b5b, #ffb054); }
+  .energy .fill { background: linear-gradient(90deg, #53c8ff, #bc85ff); }
 
-  .fill {
-    height: 100%;
-    background: linear-gradient(90deg, #43d36b, #d2ff66);
-    width: 100%;
-  }
+  .timer-wrap { margin-top: 4px; }
+  .timer-bar { height: 8px; border-radius:999px; background: rgba(0,0,0,.35); overflow:hidden; }
+  .timer-bar > div { height:100%; width:100%; background:linear-gradient(90deg,#ffd166,#ff8a3a); transition: width .1s linear; }
+  .timer-bar.danger > div { background:linear-gradient(90deg,#ff5b5b,#ff2d2d); }
 
-  .energy .fill {
-    background: linear-gradient(90deg, #53c8ff, #bc85ff);
-  }
+  .question { background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.14); border-radius: 20px; padding: 16px; }
+  .question h2 { margin: 8px 0 12px; font-size: 21px; }
 
-  .question {
-    background: rgba(255,255,255,.09);
-    border: 1px solid rgba(255,255,255,.14);
-    border-radius: 20px;
-    padding: 16px;
-  }
-
-  .answers {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 9px;
-  }
-
-  .answer {
-    background: rgba(255,255,255,.12);
-    text-align: left;
-    min-height: 58px;
-    box-shadow: none;
-    border: 1px solid rgba(255,255,255,.15);
-  }
-
+  .answers { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+  .answer { background: rgba(255,255,255,.12); text-align: left; min-height: 56px; box-shadow: none; border: 1px solid rgba(255,255,255,.15); }
+  .answer:active { transform: none; }
   .correct { background: linear-gradient(180deg, #4fd46c, #238d45) !important; }
   .wrong { background: linear-gradient(180deg, #ff6b6b, #b83131) !important; }
 
-  .hand {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 9px;
-    margin-top: 12px;
-  }
+  .battle-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+  .battle-actions button { flex:1; min-width: 90px; padding: 10px; }
 
-  .battle-card {
-    background: rgba(255,255,255,.11);
-    border: 1px solid rgba(255,255,255,.16);
-    padding: 10px;
-    min-height: 115px;
-    text-align: left;
-  }
+  .hand { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; margin-top: 12px; }
+  .battle-card { background: rgba(255,255,255,.11); border: 1px solid rgba(255,255,255,.16); padding: 10px; min-height: 108px; text-align: left; }
+  .battle-card .r { font-weight:800; }
+  .r-Common{color:#cfe3f5} .r-Uncommon{color:#7fe38f} .r-Rare{color:#6fb8ff} .r-Epic{color:#c48bff} .r-Legendary{color:#ffd166}
 
-  .battle-log {
-    margin-top: 12px;
-    height: 105px;
-    overflow: auto;
-    background: rgba(0,0,0,.22);
-    border-radius: 14px;
-    padding: 10px;
-    font-size: 13px;
-  }
+  .battle-log { margin-top: 12px; height: 92px; overflow: auto; background: rgba(0,0,0,.22); border-radius: 14px; padding: 10px; font-size: 13px; }
 
-  .pack-results {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
-    margin-top: 16px;
-  }
+  .pack-results { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 16px; }
+  .pack-card { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.16); border-radius: 18px; padding: 12px; min-height: 130px; animation: pop .4s ease backwards; }
+  .pack-card:nth-child(2){animation-delay:.1s} .pack-card:nth-child(3){animation-delay:.2s}
+  .pack-card:nth-child(4){animation-delay:.3s} .pack-card:nth-child(5){animation-delay:.4s}
+  @keyframes pop { from { opacity:0; transform:scale(.6) rotate(-6deg);} to {opacity:1; transform:none;} }
 
-  .pack-card {
-    background: rgba(255,255,255,.1);
-    border: 1px solid rgba(255,255,255,.16);
-    border-radius: 18px;
-    padding: 12px;
-    min-height: 145px;
+  .dex-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(120px,1fr)); gap:10px; margin-top:14px; }
+  .dex-card { background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); border-radius:16px; padding:12px; text-align:center; }
+  .dex-card.unknown { opacity:.4; }
+  .dex-card .e { font-size:38px; }
+
+  .win-art { font-size: 80px; text-align:center; animation: pop .5s ease; }
+  .confetti-row { text-align:center; font-size:30px; letter-spacing:6px; }
+
+  #toast {
+    position: fixed; left: 50%; top: 18px; transform: translateX(-50%);
+    background: rgba(5,14,25,.95); border:1px solid rgba(255,255,255,.2);
+    padding:10px 18px; border-radius: 999px; font-weight:800; z-index: 30;
+    opacity:0; transition: opacity .25s ease, transform .25s ease; pointer-events:none;
   }
+  #toast.show { opacity:1; transform: translateX(-50%) translateY(4px); }
 
   @media (max-width: 900px) {
     body { overflow: auto; }
     .menu-card, .layout, .battle-grid, .starter-grid { grid-template-columns: 1fr; }
     #game { height: auto; min-height: 100vh; }
-    .answers, .hand, .pack-results { grid-template-columns: 1fr; }
+    #game.active { display: block; }
+    .layout { height: auto; }
+    .answers, .hand, .pack-results { grid-template-columns: 1fr 1fr; }
+    .side-panel { grid-template-rows: none; }
+    #enemySprite { right: 30px; top: 60px; font-size:64px; }
+    #playerSprite { left: 30px; bottom: 40px; font-size:64px; }
   }
+  @media (min-width: 901px) { .touch-controls { display:none; } }
 </style>
 </head>
 <body>
 
+<div id="toast"></div>
+
 <section id="menu" class="screen active">
   <div class="menu-card">
     <div>
-      <h1>QuizMon<br>Arena</h1>
+      <h1>QuizMon<br><span class="accent">Arena</span></h1>
       <div class="subtitle">
-        Explore a pixel world, answer vocabulary and knowledge questions, battle wild QuizMons, level up, earn coins, and open Battle Packs.
+        Explore a pixel world, answer questions to power your attacks, <b>catch</b> wild QuizMons,
+        build a team of six, master the type triangle, open Battle Packs, and defeat the Champion.
       </div>
-      <div class="scene"></div>
+      <div class="scene"><div class="roamer">🐝📚</div></div>
     </div>
     <div class="menu-buttons">
       <button class="green" onclick="startNew()">New Game</button>
       <button onclick="continueGame()">Continue</button>
       <button class="purple" onclick="quickBattle()">Quick Test Battle</button>
       <button class="ghost" onclick="resetSave()">Reset Save</button>
+      <div class="small" style="text-align:center;margin-top:4px">Move: WASD / arrows · Interact: E · Answer: 1–4</div>
     </div>
   </div>
 </section>
@@ -488,29 +539,30 @@
 <section id="starter" class="screen">
   <div class="starter-box">
     <div class="dialogue">
-      <b>Professor Lex:</b> The Crystal of Knowledge has shattered. Choose your first QuizMon. Correct answers will power your attacks.
+      <b>Professor Lex:</b> The Crystal of Knowledge has shattered and wild QuizMons roam the routes.
+      Choose your first partner. Answer questions correctly to attack — and remember the type triangle:
+      <span class="badge-type t-Fire">Fire</span> beats <span class="badge-type t-Nature">Nature</span> beats
+      <span class="badge-type t-Water">Water</span> beats <span class="badge-type t-Fire">Fire</span>.
     </div>
 
     <div class="starter-grid">
       <div class="starter-card" onclick="chooseStarter('Flamink')">
         <div class="monster">🔥🦊</div>
         <h2>Flamink</h2>
-        <p><b>Fire Type</b></p>
-        <p class="small">Fast attacker. Bonus damage after answer streaks.</p>
+        <span class="badge-type t-Fire">Fire</span>
+        <p class="small" style="margin-top:10px">Fast attacker. +7 bonus damage once your Knowledge Chain hits 3.</p>
       </div>
-
       <div class="starter-card" onclick="chooseStarter('Aquabbit')">
         <div class="monster">💧🐰</div>
         <h2>Aquabbit</h2>
-        <p><b>Water Type</b></p>
-        <p class="small">Balanced defender. Heals after correct answers.</p>
+        <span class="badge-type t-Water">Water</span>
+        <p class="small" style="margin-top:10px">Sturdy defender. Heals 8 HP on every even-numbered chain.</p>
       </div>
-
       <div class="starter-card" onclick="chooseStarter('Leafling')">
         <div class="monster">🌿🦎</div>
         <h2>Leafling</h2>
-        <p><b>Nature Type</b></p>
-        <p class="small">Healing specialist. Strong in vocabulary battles.</p>
+        <span class="badge-type t-Nature">Nature</span>
+        <p class="small" style="margin-top:10px">Scholar. Heals 10 HP whenever it answers a Vocabulary question right.</p>
       </div>
     </div>
   </div>
@@ -522,9 +574,12 @@
     <div class="stats">
       <div class="pill" id="levelText">Lv. 1</div>
       <div class="pill" id="xpText">XP 0 / 100</div>
-      <div class="pill" id="coinText">Coins 0</div>
-      <div class="pill" id="packText">Packs 0</div>
-      <div class="pill" id="chainText">Best Chain 0</div>
+      <div class="pill" id="coinText">🪙 0</div>
+      <div class="pill" id="ballText">🔮 0</div>
+      <div class="pill" id="potionText">🧪 0</div>
+      <div class="pill" id="packText">🎴 0</div>
+      <div class="pill" id="badgeText">🏅 0</div>
+      <div class="pill click" id="muteBtn" onclick="toggleMute()" title="Toggle sound">🔊</div>
     </div>
   </div>
 
@@ -535,35 +590,53 @@
           <h2 id="locationName" style="margin:0;">Oakridge Village</h2>
           <div class="small" id="locationHint">Use arrow keys or WASD. Press E to interact.</div>
         </div>
-        <button class="gold" onclick="interact()">Interact</button>
+        <button class="gold" onclick="interact()">Interact (E)</button>
       </div>
       <div id="map"></div>
+
+      <div class="touch-controls">
+        <button class="dp-up" onclick="move(0,-1)">▲</button>
+        <button class="dp-left" onclick="move(-1,0)">◀</button>
+        <button class="dp-act" onclick="interact()">E</button>
+        <button class="dp-right" onclick="move(1,0)">▶</button>
+        <button class="dp-down" onclick="move(0,1)">▼</button>
+      </div>
     </div>
 
     <div class="side-panel">
       <div class="card">
-        <h3>Party</h3>
+        <h3>Team <span class="small" id="teamCount"></span></h3>
         <div id="party"></div>
       </div>
 
       <div class="card">
         <h3>Quest</h3>
-        <div class="small" id="quest">Win 3 battles, then challenge Professor Lex in the arena.</div>
+        <div class="small" id="quest"></div>
       </div>
 
       <div class="card">
-        <h3>Battle Pack / Deck</h3>
-        <div class="small" id="deckText"></div>
-        <br>
+        <h3>Shop &amp; Packs</h3>
+        <div class="actions three" style="margin-bottom:8px">
+          <button class="gold" onclick="buyPack()">Pack 75🪙</button>
+          <button class="green" onclick="buyPotion()">Potion 40🪙</button>
+          <button class="purple" onclick="buyBall()">Ball 30🪙</button>
+        </div>
         <div class="actions">
           <button class="gold" onclick="openPack()">Open Pack</button>
-          <button class="green" onclick="buyPack()">Buy Pack</button>
+          <button class="ghost" onclick="showDex()">Dex</button>
+        </div>
+        <div class="small" id="deckText" style="margin-top:8px"></div>
+      </div>
+
+      <div class="card">
+        <h3>Actions</h3>
+        <div class="actions">
           <button class="purple" onclick="startBattle(null, 'Vocabulary')">Vocab Battle</button>
-          <button class="ghost" onclick="heal()">Heal</button>
+          <button class="green" onclick="healTeam()">Rest / Heal</button>
         </div>
       </div>
 
-      <div class="card">
+      <div class="card" style="display:flex; flex-direction:column; min-height:0;">
         <h3>Log</h3>
         <div id="log"></div>
       </div>
@@ -574,15 +647,15 @@
 <div id="battleModal" class="modal">
   <div class="modal-card">
     <div class="battle-grid">
-      <div class="stage">
+      <div class="stage" id="stage">
         <div class="hpbox enemybox">
-          <b id="enemyName">Enemy</b>
+          <div class="row"><b id="enemyName">Enemy</b><span class="badge-type" id="enemyType"></span></div>
           <div class="bar"><div class="fill" id="enemyHp"></div></div>
           <div class="small" id="enemyHpText"></div>
         </div>
 
         <div class="hpbox playerbox">
-          <b id="playerName">Player</b>
+          <div class="row"><b id="playerName">Player</b><span class="badge-type" id="playerType"></span></div>
           <div class="bar"><div class="fill" id="playerHp"></div></div>
           <div class="bar energy"><div class="fill" id="energyBar"></div></div>
           <div class="small" id="playerHpText"></div>
@@ -595,18 +668,30 @@
       <div>
         <div class="question">
           <div class="small" id="questionMeta"></div>
+          <div class="timer-wrap"><div class="timer-bar" id="timerBar"><div></div></div></div>
           <h2 id="questionText"></h2>
           <div class="answers" id="answers"></div>
         </div>
 
-        <h3>Battle Cards</h3>
+        <div class="battle-actions">
+          <button class="purple" id="catchBtn" onclick="attemptCatch()">Catch 🔮</button>
+          <button class="green" id="potionBtn" onclick="usePotion()">Potion 🧪</button>
+          <button class="gold" id="switchBtn" onclick="toggleSwitch()">Switch 🔁</button>
+          <button class="ghost" onclick="runAway()">Run</button>
+        </div>
+
+        <div id="switchRow" style="display:none; margin-top:10px;"></div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
+          <h3 style="margin:0">Battle Cards</h3>
+          <span class="small" id="cardHint"></span>
+        </div>
         <div class="hand" id="hand"></div>
 
         <div class="battle-log" id="battleLog"></div>
 
         <div style="margin-top:12px; display:flex; gap:8px; justify-content:flex-end;">
-          <button class="ghost" onclick="runAway()">Run</button>
-          <button class="green" id="nextBtn" onclick="nextQuestion()" style="display:none;">Next</button>
+          <button class="green" id="nextBtn" onclick="nextQuestion()" style="display:none;">Next ▶</button>
           <button class="gold" id="returnBtn" onclick="closeBattle()" style="display:none;">Return</button>
         </div>
       </div>
@@ -616,55 +701,124 @@
 
 <div id="packModal" class="modal">
   <div class="modal-card">
-    <h2>Bronze Battle Pack</h2>
+    <h2 id="packTitle">Bronze Battle Pack</h2>
     <div class="small">You opened 5 cards.</div>
     <div class="pack-results" id="packResults"></div>
     <br>
-    <button class="gold" onclick="closePack()">Close</button>
+    <button class="gold" onclick="closePack()">Add to Deck</button>
+  </div>
+</div>
+
+<div id="dexModal" class="modal">
+  <div class="modal-card">
+    <h2>QuizDex <span class="small" id="dexCount"></span></h2>
+    <div class="small">Every species you have seen or caught in the wild.</div>
+    <div class="dex-grid" id="dexGrid"></div>
+    <br>
+    <button class="gold" onclick="closeDex()">Close</button>
+  </div>
+</div>
+
+<div id="winModal" class="modal">
+  <div class="modal-card" style="text-align:center;">
+    <div class="win-art" id="winArt">🏆</div>
+    <h2 id="winTitle">Victory!</h2>
+    <p class="small" id="winText"></p>
+    <div class="confetti-row">🎉 ✨ 🎊 ✨ 🎉</div>
+    <br>
+    <button class="gold" onclick="closeWin()">Continue</button>
   </div>
 </div>
 
 <script>
-const monsters = {
-  Flamink: { emoji: "🔥🦊", hp: 100, atk: 18, def: 3, type: "Fire" },
-  Aquabbit: { emoji: "💧🐰", hp: 115, atk: 14, def: 6, type: "Water" },
-  Leafling: { emoji: "🌿🦎", hp: 108, atk: 15, def: 4, type: "Nature" }
+/* ------------------------------------------------------------------ *
+ *  QuizMon Arena — data
+ * ------------------------------------------------------------------ */
+const SAVE_KEY = "quizmon-arena-save";
+const SAVE_VERSION = 2;
+
+// Type triangle: attacker -> the type it is strong against
+const STRONG = { Fire: "Nature", Nature: "Water", Water: "Fire" };
+function typeMult(atkType, defType) {
+  if (STRONG[atkType] === defType) return 1.5;   // super effective
+  if (STRONG[defType] === atkType) return 0.67;  // not very effective
+  return 1;
+}
+
+// Species: starters + everything catchable in the wild
+const species = {
+  Flamink:  { emoji:"🔥🦊", type:"Fire",   baseHp:60, baseAtk:14, baseDef:4 },
+  Aquabbit: { emoji:"💧🐰", type:"Water",  baseHp:70, baseAtk:11, baseDef:7 },
+  Leafling: { emoji:"🌿🦎", type:"Nature", baseHp:66, baseAtk:12, baseDef:5 },
+  Sparkit:  { emoji:"⚡🐱", type:"Fire",   baseHp:54, baseAtk:13, baseDef:3 },
+  Emberug:  { emoji:"🔥🐛", type:"Fire",   baseHp:58, baseAtk:12, baseDef:4 },
+  Bookbug:  { emoji:"📘🐞", type:"Nature", baseHp:56, baseAtk:10, baseDef:5 },
+  Vocabee:  { emoji:"🐝📚", type:"Nature", baseHp:52, baseAtk:14, baseDef:3 },
+  Owlite:   { emoji:"🦉✨", type:"Water",  baseHp:62, baseAtk:12, baseDef:5 },
+  Aquadrop: { emoji:"💧🐟", type:"Water",  baseHp:66, baseAtk:11, baseDef:6 },
+  Terrapup: { emoji:"🌿🐶", type:"Nature", baseHp:64, baseAtk:12, baseDef:6 },
+  Mathmoth: { emoji:"🔢🦋", type:"Fire",   baseHp:60, baseAtk:15, baseDef:3 },
+  Glaquill: { emoji:"❄️🦔", type:"Water",  baseHp:72, baseAtk:11, baseDef:7 }
 };
 
-const wilds = [
-  { name: "Sparkit", emoji: "⚡🐱", hp: 62, atk: 12, def: 2, xp: 26, coins: 18 },
-  { name: "Bookbug", emoji: "📘🐞", hp: 58, atk: 10, def: 3, xp: 24, coins: 16 },
-  { name: "Owlite", emoji: "🦉✨", hp: 72, atk: 13, def: 4, xp: 31, coins: 22 },
-  { name: "Vocabee", emoji: "🐝📚", hp: 64, atk: 14, def: 2, xp: 34, coins: 25 }
-];
+// Which species appear in the wild (starters excluded)
+const wildPool = ["Sparkit","Emberug","Bookbug","Vocabee","Owlite","Aquadrop","Terrapup","Mathmoth","Glaquill"];
 
 const cards = {
-  "Quick Strike": { cost: 1, rarity: "Common", text: "Deal 15 damage.", effect: "damage", power: 15 },
-  "Shield": { cost: 1, rarity: "Common", text: "Block 15 damage.", effect: "shield", power: 15 },
-  "Leaf Heal": { cost: 2, rarity: "Common", text: "Heal 25 HP.", effect: "heal", power: 25 },
-  "Word Spark": { cost: 2, rarity: "Uncommon", text: "Deal 20 damage. +10 in Vocabulary.", effect: "word", power: 20 },
-  "Double Damage": { cost: 3, rarity: "Rare", text: "Next correct answer hits twice.", effect: "double", power: 2 },
-  "Fire Blast": { cost: 3, rarity: "Rare", text: "Deal 38 damage.", effect: "damage", power: 38 },
-  "Knowledge Surge": { cost: 4, rarity: "Epic", text: "Gain 3 energy and draw 2.", effect: "surge", power: 3 },
-  "Legend Beam": { cost: 5, rarity: "Legendary", text: "Deal 75 damage.", effect: "damage", power: 75 }
+  "Quick Strike":    { cost: 1, rarity: "Common",    text: "Deal 15 damage.",              effect: "damage", power: 15 },
+  "Shield":          { cost: 1, rarity: "Common",    text: "Block up to 18 damage.",        effect: "shield", power: 18 },
+  "Leaf Heal":       { cost: 2, rarity: "Common",    text: "Heal 25 HP.",                   effect: "heal",   power: 25 },
+  "Word Spark":      { cost: 2, rarity: "Uncommon",  text: "Deal 20 (+12 on Vocabulary).",  effect: "word",   power: 20 },
+  "Double Damage":   { cost: 3, rarity: "Rare",      text: "Next correct answer hits twice.",effect: "double", power: 2 },
+  "Fire Blast":      { cost: 3, rarity: "Rare",      text: "Deal 38 damage.",               effect: "damage", power: 38 },
+  "Focus":           { cost: 2, rarity: "Uncommon",  text: "+6s on the next question timer.",effect: "focus",  power: 6 },
+  "Knowledge Surge": { cost: 4, rarity: "Epic",      text: "Gain 3 energy, draw a card.",   effect: "surge",  power: 3 },
+  "Legend Beam":     { cost: 5, rarity: "Legendary", text: "Deal 75 damage.",               effect: "damage", power: 75 }
 };
 
 const questions = [
-  { c:"Vocabulary", q:"Which word means very surprised?", a:["Scarce","Astonished","Tiny","Careless"], correct:1 },
-  { c:"Vocabulary", q:"What is a synonym for rapid?", a:["Fast","Quiet","Weak","Careful"], correct:0 },
-  { c:"Vocabulary", q:"What is an antonym of scarce?", a:["Rare","Abundant","Small","Hidden"], correct:1 },
-  { c:"Vocabulary", q:"Which word means using few words?", a:["Brief","Ancient","Furious","Fragile"], correct:0 },
-  { c:"Vocabulary", q:"The prefix bio- means:", a:["Sound","Life","Earth","Water"], correct:1 },
-  { c:"Vocabulary", q:"What does predict mean?", a:["Guess before","Erase","Measure","Run quickly"], correct:0 },
-  { c:"Vocabulary", q:"Which word means make better?", a:["Ignore","Improve","Scatter","Delay"], correct:1 },
-  { c:"Vocabulary", q:"What is a synonym for brave?", a:["Timid","Dull","Courageous","Careless"], correct:2 },
-  { c:"Math", q:"What is 8 × 7?", a:["54","56","63","49"], correct:1 },
-  { c:"Math", q:"What is 45 ÷ 5?", a:["7","8","9","10"], correct:2 },
-  { c:"Science", q:"Which planet is called the Red Planet?", a:["Venus","Mars","Jupiter","Mercury"], correct:1 },
-  { c:"Science", q:"Plants make food using:", a:["Photosynthesis","Magnetism","Friction","Evaporation"], correct:0 },
-  { c:"History", q:"Who was the first U.S. President?", a:["Lincoln","Washington","Jefferson","Adams"], correct:1 },
-  { c:"Geography", q:"What is the capital of France?", a:["Rome","Paris","Madrid","Berlin"], correct:1 },
-  { c:"Geography", q:"Largest ocean on Earth?", a:["Atlantic","Indian","Pacific","Arctic"], correct:2 }
+  // Vocabulary
+  { c:"Vocabulary", d:1, q:"Which word means very surprised?", a:["Scarce","Astonished","Tiny","Careless"], correct:1 },
+  { c:"Vocabulary", d:1, q:"What is a synonym for rapid?", a:["Fast","Quiet","Weak","Careful"], correct:0 },
+  { c:"Vocabulary", d:2, q:"What is an antonym of scarce?", a:["Rare","Abundant","Small","Hidden"], correct:1 },
+  { c:"Vocabulary", d:2, q:"Which word means using few words?", a:["Brief","Ancient","Furious","Fragile"], correct:0 },
+  { c:"Vocabulary", d:2, q:"The prefix bio- means:", a:["Sound","Life","Earth","Water"], correct:1 },
+  { c:"Vocabulary", d:1, q:"What does predict mean?", a:["Guess before","Erase","Measure","Run quickly"], correct:0 },
+  { c:"Vocabulary", d:1, q:"Which word means make better?", a:["Ignore","Improve","Scatter","Delay"], correct:1 },
+  { c:"Vocabulary", d:1, q:"What is a synonym for brave?", a:["Timid","Dull","Courageous","Careless"], correct:2 },
+  { c:"Vocabulary", d:3, q:"'Benevolent' most nearly means:", a:["Kind","Hostile","Confused","Wealthy"], correct:0 },
+  { c:"Vocabulary", d:3, q:"An antonym of 'ancient' is:", a:["Old","Modern","Fragile","Wise"], correct:1 },
+  { c:"Vocabulary", d:2, q:"The root 'aqua' relates to:", a:["Fire","Air","Water","Stone"], correct:2 },
+  { c:"Vocabulary", d:3, q:"'Meticulous' describes someone who is:", a:["Careless","Very careful","Loud","Lazy"], correct:1 },
+  // Math
+  { c:"Math", d:1, q:"What is 8 × 7?", a:["54","56","63","49"], correct:1 },
+  { c:"Math", d:1, q:"What is 45 ÷ 5?", a:["7","8","9","10"], correct:2 },
+  { c:"Math", d:2, q:"What is 12 × 12?", a:["124","132","144","154"], correct:2 },
+  { c:"Math", d:2, q:"What is 15% of 200?", a:["20","25","30","35"], correct:2 },
+  { c:"Math", d:2, q:"What is 7²?", a:["42","49","56","64"], correct:1 },
+  { c:"Math", d:3, q:"Solve: 3x = 21, x = ?", a:["6","7","8","9"], correct:1 },
+  { c:"Math", d:1, q:"What is 100 − 37?", a:["63","67","73","57"], correct:0 },
+  { c:"Math", d:3, q:"Area of a triangle, base 10 height 6?", a:["30","60","16","36"], correct:0 },
+  // Science
+  { c:"Science", d:1, q:"Which planet is called the Red Planet?", a:["Venus","Mars","Jupiter","Mercury"], correct:1 },
+  { c:"Science", d:1, q:"Plants make food using:", a:["Photosynthesis","Magnetism","Friction","Evaporation"], correct:0 },
+  { c:"Science", d:2, q:"H₂O is the formula for:", a:["Salt","Water","Oxygen","Sugar"], correct:1 },
+  { c:"Science", d:2, q:"What gas do humans breathe in to survive?", a:["Nitrogen","Hydrogen","Oxygen","Helium"], correct:2 },
+  { c:"Science", d:3, q:"The powerhouse of the cell is the:", a:["Nucleus","Ribosome","Mitochondrion","Membrane"], correct:2 },
+  { c:"Science", d:2, q:"How many bones in the adult human body?", a:["206","201","210","190"], correct:0 },
+  { c:"Science", d:3, q:"Speed of light is about:", a:["300 km/s","3,000 km/s","300,000 km/s","30 km/s"], correct:2 },
+  // History
+  { c:"History", d:1, q:"Who was the first U.S. President?", a:["Lincoln","Washington","Jefferson","Adams"], correct:1 },
+  { c:"History", d:2, q:"The Great Wall is found in:", a:["India","China","Egypt","Peru"], correct:1 },
+  { c:"History", d:2, q:"Ancient pyramids at Giza were built by the:", a:["Romans","Greeks","Egyptians","Aztecs"], correct:2 },
+  { c:"History", d:3, q:"In what year did WWII end?", a:["1943","1945","1948","1950"], correct:1 },
+  // Geography
+  { c:"Geography", d:1, q:"What is the capital of France?", a:["Rome","Paris","Madrid","Berlin"], correct:1 },
+  { c:"Geography", d:1, q:"Largest ocean on Earth?", a:["Atlantic","Indian","Pacific","Arctic"], correct:2 },
+  { c:"Geography", d:2, q:"Which country has the most people?", a:["USA","India","Russia","Brazil"], correct:1 },
+  { c:"Geography", d:2, q:"The Sahara Desert is on which continent?", a:["Asia","Africa","Australia","Europe"], correct:1 },
+  { c:"Geography", d:3, q:"The longest river in the world is the:", a:["Amazon","Nile","Yangtze","Mississippi"], correct:1 },
+  { c:"Geography", d:1, q:"Mount Everest is the tallest:", a:["Volcano","Mountain","Waterfall","Plateau"], correct:1 }
 ];
 
 const mapData = [
@@ -685,331 +839,516 @@ const tileClass = {
   "B":"path", "L":"lab", "S":"shop", "A":"arena", "I":"sign"
 };
 
-let state = {
-  started:false,
-  starter:null,
-  x:2,
-  y:7,
-  level:1,
-  xp:0,
-  coins:60,
-  packs:1,
-  hp:100,
-  maxHp:100,
-  wins:0,
-  bestChain:0,
-  deck:["Quick Strike","Quick Strike","Shield","Leaf Heal","Word Spark"],
-  log:["Welcome to Oakridge Village."]
-};
-
-let battle = null;
-
-function save() {
-  localStorage.setItem("quizmon-arena-save", JSON.stringify(state));
+/* ------------------------------------------------------------------ *
+ *  State
+ * ------------------------------------------------------------------ */
+function defaultState() {
+  return {
+    version: SAVE_VERSION,
+    started: false,
+    party: [],
+    activeIndex: 0,
+    x: 2, y: 7,
+    coins: 60, packs: 1, balls: 3, potions: 2,
+    wins: 0, bestChain: 0, badges: 0,
+    seen: [], caught: [],
+    deck: ["Quick Strike","Quick Strike","Shield","Leaf Heal","Word Spark","Focus"],
+    muted: false,
+    log: ["Welcome to Oakridge Village."]
+  };
 }
 
+let state = defaultState();
+let battle = null;
+
+/* --- monster instance helpers --- */
+function hpAt(s, l)  { return Math.round(s.baseHp  * (1 + (l - 1) * 0.15)); }
+function atkAt(s, l) { return Math.round(s.baseAtk * (1 + (l - 1) * 0.10)); }
+function defAt(s, l) { return Math.round(s.baseDef * (1 + (l - 1) * 0.08)); }
+function xpNeed(l)   { return 100 + (l - 1) * 40; }
+
+function makeMon(name, level) {
+  const s = species[name];
+  const max = hpAt(s, level);
+  return { name, level, xp: 0, hp: max, maxHp: max };
+}
+function active() { return state.party[state.activeIndex]; }
+function anyAlive() { return state.party.some(m => m.hp > 0); }
+
+/* ------------------------------------------------------------------ *
+ *  Save / load (versioned + defensive)
+ * ------------------------------------------------------------------ */
+function save() {
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch (e) {}
+}
 function load() {
-  const raw = localStorage.getItem("quizmon-arena-save");
+  let raw;
+  try { raw = localStorage.getItem(SAVE_KEY); } catch (e) { return false; }
   if (!raw) return false;
-  state = JSON.parse(raw);
+  let data;
+  try { data = JSON.parse(raw); } catch (e) { return false; }
+  if (!data || !Array.isArray(data.party) || data.party.length === 0) return false;
+  state = Object.assign(defaultState(), data);   // merge so new fields exist
+  state.version = SAVE_VERSION;
   return true;
 }
 
+/* ------------------------------------------------------------------ *
+ *  Audio (WebAudio — no assets)
+ * ------------------------------------------------------------------ */
+let audioCtx = null;
+function ac() {
+  if (state.muted) return null;
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    return audioCtx;
+  } catch (e) { return null; }
+}
+function beep(freq, dur = 0.12, type = "square", vol = 0.06) {
+  const ctx = ac(); if (!ctx) return;
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = type; o.frequency.value = freq;
+  g.gain.value = vol;
+  o.connect(g); g.connect(ctx.destination);
+  const t = ctx.currentTime;
+  o.start(t);
+  g.gain.setValueAtTime(vol, t);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.stop(t + dur);
+}
+const sfx = {
+  correct: () => { beep(660, .09, "square"); setTimeout(() => beep(990, .12, "square"), 90); },
+  wrong:   () => { beep(200, .22, "sawtooth", .07); },
+  hit:     () => { beep(140, .12, "sawtooth", .06); },
+  heal:    () => { beep(520, .1, "sine", .07); setTimeout(() => beep(760, .12, "sine", .07), 90); },
+  coin:    () => { beep(880, .06, "square", .05); setTimeout(() => beep(1180, .08, "square", .05), 60); },
+  win:     () => { [523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.16,"square",.07), i*130)); },
+  catch:   () => { beep(400,.1,"triangle",.07); setTimeout(()=>beep(600,.1,"triangle",.07),120); setTimeout(()=>beep(900,.16,"triangle",.07),260); },
+  fail:    () => { beep(300,.14,"sine",.05); setTimeout(()=>beep(220,.18,"sine",.05),140); }
+};
+function toggleMute() {
+  state.muted = !state.muted;
+  document.getElementById("muteBtn").textContent = state.muted ? "🔇" : "🔊";
+  if (!state.muted) sfx.coin();
+  save();
+}
+
+/* ------------------------------------------------------------------ *
+ *  Juice
+ * ------------------------------------------------------------------ */
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove("show"), 1600);
+}
+function floatNum(spriteId, text, color) {
+  const stage = document.getElementById("stage");
+  const sprite = document.getElementById(spriteId);
+  if (!stage || !sprite) return;
+  const f = document.createElement("div");
+  f.className = "float-num";
+  f.textContent = text;
+  f.style.color = color;
+  f.style.left = (sprite.offsetLeft + 20) + "px";
+  f.style.top = (sprite.offsetTop - 6) + "px";
+  stage.appendChild(f);
+  setTimeout(() => f.remove(), 1000);
+}
+function hitAnim(spriteId) {
+  const s = document.getElementById(spriteId);
+  if (!s) return;
+  s.classList.remove("hit"); void s.offsetWidth; s.classList.add("hit");
+}
+function attackAnim(spriteId, who) {
+  const s = document.getElementById(spriteId);
+  if (!s) return;
+  const cls = who === "p" ? "attack-p" : "attack-e";
+  s.classList.remove(cls); void s.offsetWidth; s.classList.add(cls);
+}
+function shakeStage() {
+  const s = document.getElementById("stage");
+  s.classList.remove("shake"); void s.offsetWidth; s.classList.add("shake");
+}
+
+/* ------------------------------------------------------------------ *
+ *  Screens / flow
+ * ------------------------------------------------------------------ */
 function show(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
-  if (id === "game") {
-    renderMap();
-    updateUI();
-  }
+  if (id === "game") { renderMap(); updateUI(); }
 }
-
 function startNew() {
+  state = defaultState();
   show("starter");
 }
-
 function continueGame() {
-  if (load()) show("game");
-  else alert("No save yet. Start a new game.");
+  if (load()) { document.getElementById("muteBtn").textContent = state.muted ? "🔇" : "🔊"; show("game"); }
+  else toast("No save yet — start a new game.");
 }
-
 function resetSave() {
-  localStorage.removeItem("quizmon-arena-save");
+  try { localStorage.removeItem(SAVE_KEY); } catch (e) {}
+  state = defaultState();
   location.reload();
 }
-
 function quickBattle() {
   if (!state.started) chooseStarter("Flamink", true);
+  show("game");
   startBattle();
 }
-
-function chooseStarter(name, skipScreen=false) {
-  const mon = monsters[name];
+function chooseStarter(name, skipScreen = false) {
   state.started = true;
-  state.starter = name;
-  state.hp = mon.hp;
-  state.maxHp = mon.hp;
-  if (name === "Flamink") state.deck.push("Fire Blast");
+  state.party = [ makeMon(name, 5) ];
+  state.activeIndex = 0;
+  markSeen(name); markCaught(name);
+  if (name === "Flamink")  state.deck.push("Fire Blast");
   if (name === "Aquabbit") state.deck.push("Shield");
   if (name === "Leafling") state.deck.push("Leaf Heal");
-  state.log.push(`${name} joined your party.`);
+  state.log.push(`${name} joined your team!`);
   save();
   if (!skipScreen) show("game");
 }
 
+function markSeen(name)   { if (!state.seen.includes(name)) state.seen.push(name); }
+function markCaught(name) { markSeen(name); if (!state.caught.includes(name)) state.caught.push(name); }
+
+/* ------------------------------------------------------------------ *
+ *  Map
+ * ------------------------------------------------------------------ */
 function renderMap() {
   const map = document.getElementById("map");
   map.innerHTML = "";
-
-  for (let y=0; y<mapData.length; y++) {
-    for (let x=0; x<mapData[y].length; x++) {
-      const char = mapData[y][x];
+  for (let y = 0; y < mapData.length; y++) {
+    for (let x = 0; x < mapData[y].length; x++) {
       const div = document.createElement("div");
-      div.className = "tile " + tileClass[char];
-
+      div.className = "tile " + tileClass[mapData[y][x]];
       if (x === state.x && y === state.y) {
         const p = document.createElement("div");
-        p.className = "player";
-        p.textContent = "🧢";
+        p.className = "player"; p.id = "playerToken"; p.textContent = "🧢";
         div.appendChild(p);
       }
-
       map.appendChild(div);
     }
   }
-
   updateLocation();
 }
-
 function updateLocation() {
   const char = mapData[state.y][state.x];
-  let name = "Oakridge Village";
-  let hint = "Use arrow keys or WASD. Press E to interact.";
-
-  if (char === "G") {
-    name = "Knowledge Forest — Tall Grass";
-    hint = "Wild QuizMons can appear here.";
-  }
-  if (char === "L") {
-    name = "Professor Lex's Lab";
-    hint = "Press E to heal.";
-  }
-  if (char === "S") {
-    name = "Pack Shop";
-    hint = "Press E to buy or open packs.";
-  }
-  if (char === "A") {
-    name = "Training Arena";
-    hint = "Press E to start a battle.";
-  }
-  if (char === "I") {
-    name = "Signpost";
-    hint = "Press E to read the sign.";
-  }
-
+  const info = {
+    "G": ["Route — Tall Grass", "Wild QuizMons appear here. Press E to search."],
+    "L": ["Professor Lex's Lab", "Press E to fully heal your team."],
+    "S": ["Pack Shop", "Press E to open a pack (or buy from the panel)."],
+    "A": ["Battle Arena", "Press E to train — or challenge the Champion when ready."],
+    "I": ["Signpost", "Press E to read the sign."]
+  };
+  const [name, hint] = info[char] || ["Oakridge Village", "Use arrow keys or WASD. Press E to interact."];
   document.getElementById("locationName").textContent = name;
   document.getElementById("locationHint").textContent = hint;
 }
-
-function updateUI() {
-  const mon = monsters[state.starter] || monsters.Flamink;
-  document.getElementById("levelText").textContent = `Lv. ${state.level}`;
-  document.getElementById("xpText").textContent = `XP ${state.xp} / ${xpNeed()}`;
-  document.getElementById("coinText").textContent = `Coins ${state.coins}`;
-  document.getElementById("packText").textContent = `Packs ${state.packs}`;
-  document.getElementById("chainText").textContent = `Best Chain ${state.bestChain}`;
-  document.getElementById("party").innerHTML = `
-    <div style="font-size:42px">${mon.emoji}</div>
-    <b>${state.starter}</b>
-    <div class="small">${mon.type} Type</div>
-    <div class="small">HP ${Math.round(state.hp)} / ${state.maxHp}</div>
-  `;
-  document.getElementById("deckText").innerHTML = `Deck: ${state.deck.length} cards<br>Wins: ${state.wins}`;
-  document.getElementById("log").innerHTML = state.log.slice(-8).map(x => `<div>${x}</div>`).join("");
+function canWalk(x, y) {
+  const c = mapData[y] && mapData[y][x];
+  return c && c !== "T" && c !== "W";
 }
-
-function xpNeed() {
-  return 100 + (state.level - 1) * 50;
-}
-
-function addXp(n) {
-  state.xp += n;
-  while (state.xp >= xpNeed()) {
-    state.xp -= xpNeed();
-    state.level++;
-    state.maxHp += 10;
-    state.hp = state.maxHp;
-    state.packs++;
-    state.log.push(`Level up! You reached Lv. ${state.level} and earned a pack.`);
-  }
-}
-
-function canWalk(x,y) {
-  const char = mapData[y]?.[x];
-  return char && char !== "T" && char !== "W";
-}
-
-function move(dx,dy) {
+function move(dx, dy) {
   if (battle) return;
-  const nx = state.x + dx;
-  const ny = state.y + dy;
-  if (!canWalk(nx,ny)) return;
-
-  state.x = nx;
-  state.y = ny;
-  renderMap();
-  save();
-
-  if (mapData[ny][nx] === "G" && Math.random() < .25) {
-    startBattle();
+  const nx = state.x + dx, ny = state.y + dy;
+  if (!canWalk(nx, ny)) {
+    const tok = document.getElementById("playerToken");
+    if (tok) { tok.classList.remove("bump"); void tok.offsetWidth; tok.classList.add("bump"); }
+    return;
   }
+  state.x = nx; state.y = ny;
+  renderMap(); save();
+  if (mapData[ny][nx] === "G" && Math.random() < 0.28) startBattle();
 }
-
 document.addEventListener("keydown", e => {
   const k = e.key.toLowerCase();
-  if (k === "arrowup" || k === "w") move(0,-1);
-  if (k === "arrowdown" || k === "s") move(0,1);
-  if (k === "arrowleft" || k === "a") move(-1,0);
-  if (k === "arrowright" || k === "d") move(1,0);
-  if (k === "e" || k === "enter" || k === " ") interact();
-});
-
-function interact() {
-  const char = mapData[state.y][state.x];
-
-  if (char === "L") {
-    heal();
-    state.log.push("Professor Lex healed your QuizMon.");
-  } else if (char === "S") {
-    if (state.packs > 0) openPack();
-    else buyPack();
-  } else if (char === "A") {
-    startBattle();
-  } else if (char === "I") {
-    state.log.push("Sign: Win battles by answering questions. Open packs to get stronger cards.");
-  } else if (char === "G") {
-    startBattle();
-  } else {
-    state.log.push("Nothing special here.");
+  if (battle) {
+    if (!battle.answered && ["1","2","3","4"].includes(k)) {
+      const idx = +k - 1;
+      if (idx < battle.question.a.length) answer(idx);
+    }
+    return;
   }
-
-  updateUI();
-  save();
+  if (["arrowup","w","arrowdown","s","arrowleft","a","arrowright","d"," "].includes(k)) e.preventDefault();
+  if (k === "arrowup" || k === "w") move(0, -1);
+  else if (k === "arrowdown" || k === "s") move(0, 1);
+  else if (k === "arrowleft" || k === "a") move(-1, 0);
+  else if (k === "arrowright" || k === "d") move(1, 0);
+  else if (k === "e" || k === "enter" || k === " ") interact();
+});
+function interact() {
+  if (battle) return;
+  const char = mapData[state.y][state.x];
+  if (char === "L") { healTeam(); logMsg("Professor Lex fully healed your team."); }
+  else if (char === "S") { if (state.packs > 0) openPack(); else buyPack(); }
+  else if (char === "A") {
+    if (state.wins >= 5 && state.badges < 1) startBoss();
+    else startBattle();
+  }
+  else if (char === "I") logMsg("Sign: Weaken a wild QuizMon, then throw a 🔮 to catch it! Win 5 battles to face the Champion.");
+  else if (char === "G") startBattle();
+  else logMsg("Nothing special here.");
+  updateUI(); save();
 }
 
-function heal() {
-  state.hp = state.maxHp;
-  updateUI();
-  save();
+/* ------------------------------------------------------------------ *
+ *  UI
+ * ------------------------------------------------------------------ */
+function logMsg(m) { state.log.push(m); }
+
+function updateUI() {
+  const a = active();
+  const lvl = a ? a.level : 1;
+  document.getElementById("levelText").textContent = `Lv. ${lvl}`;
+  document.getElementById("xpText").textContent = a ? `XP ${a.xp} / ${xpNeed(a.level)}` : "XP 0";
+  document.getElementById("coinText").textContent = `🪙 ${state.coins}`;
+  document.getElementById("ballText").textContent = `🔮 ${state.balls}`;
+  document.getElementById("potionText").textContent = `🧪 ${state.potions}`;
+  document.getElementById("packText").textContent = `🎴 ${state.packs}`;
+  document.getElementById("badgeText").textContent = `🏅 ${state.badges}`;
+
+  document.getElementById("teamCount").textContent = `${state.party.length}/6`;
+  document.getElementById("party").innerHTML = state.party.map((m, i) => {
+    const s = species[m.name];
+    const pct = Math.max(0, m.hp / m.maxHp * 100);
+    return `<div class="party-row ${i === state.activeIndex ? "active" : ""} ${m.hp <= 0 ? "fainted" : ""}" onclick="setActive(${i})">
+      <div class="party-emoji">${s.emoji}</div>
+      <div class="party-info">
+        <b>${m.name}</b> <span class="badge-type t-${s.type}">${s.type}</span>
+        <div class="small">Lv.${m.level} · ${Math.max(0,Math.round(m.hp))}/${m.maxHp} HP</div>
+        <div class="minibar"><div style="width:${pct}%"></div></div>
+      </div>
+    </div>`;
+  }).join("");
+
+  document.getElementById("deckText").innerHTML =
+    `Deck: <b>${state.deck.length}</b> cards · Caught: <b>${state.caught.length}</b>/${Object.keys(species).length} · Wins: <b>${state.wins}</b>`;
+  document.getElementById("quest").innerHTML = questText();
+  document.getElementById("log").innerHTML = state.log.slice(-9).map(x => `<div>${x}</div>`).join("");
+  const logEl = document.getElementById("log");
+  logEl.scrollTop = logEl.scrollHeight;
+}
+function questText() {
+  if (state.badges >= 1) return "🏅 <b>Champion defeated!</b> Keep exploring, catching, and completing your QuizDex.";
+  if (state.wins >= 5)   return "You're ready! Head to the <b>Battle Arena</b> (⚔️) and challenge the Champion.";
+  return `Win <b>${state.wins}/5</b> battles, catch wild QuizMons, then challenge the Champion at the Arena.`;
+}
+function setActive(i) {
+  if (battle) return;
+  if (state.party[i].hp <= 0) { toast(`${state.party[i].name} has fainted.`); return; }
+  state.activeIndex = i;
+  updateUI(); save();
 }
 
+function healTeam() {
+  state.party.forEach(m => m.hp = m.maxHp);
+  sfx.heal();
+  updateUI(); save();
+}
+
+/* ------------------------------------------------------------------ *
+ *  XP / leveling (per active monster)
+ * ------------------------------------------------------------------ */
+function addXp(mon, n) {
+  mon.xp += n;
+  while (mon.xp >= xpNeed(mon.level)) {
+    mon.xp -= xpNeed(mon.level);
+    mon.level++;
+    const newMax = hpAt(species[mon.name], mon.level);
+    mon.hp += (newMax - mon.maxHp);   // gain the hp delta
+    mon.maxHp = newMax;
+    logMsg(`${mon.name} grew to Lv. ${mon.level}!`);
+    toast(`${mon.name} → Lv. ${mon.level}!`);
+    if (mon.level % 3 === 0) { state.packs++; logMsg("Level milestone: earned a Battle Pack!"); }
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ *  Enemy generation
+ * ------------------------------------------------------------------ */
 function randomEnemy() {
-  const base = wilds[Math.floor(Math.random()*wilds.length)];
-  const level = Math.max(2, state.level + Math.floor(Math.random()*3));
-  const scale = 1 + (level - 1) * .12;
+  const name = wildPool[Math.floor(Math.random() * wildPool.length)];
+  const s = species[name];
+  const lvl = Math.max(2, active().level + Math.floor(Math.random() * 3) - 1);
+  const max = hpAt(s, lvl);
   return {
-    ...base,
-    level,
-    maxHp: Math.round(base.hp * scale),
-    hp: Math.round(base.hp * scale),
-    atk: Math.round(base.atk * scale),
-    def: Math.round(base.def * scale),
-    xp: Math.round(base.xp * scale),
-    coins: Math.round(base.coins * scale)
+    name, emoji: s.emoji, type: s.type, level: lvl,
+    hp: max, maxHp: max, atk: atkAt(s, lvl), def: defAt(s, lvl),
+    xp: Math.round(20 + lvl * 4), coins: Math.round(12 + lvl * 3)
+  };
+}
+function bossEnemy() {
+  const name = "Owlite"; const s = species[name];
+  const lvl = active().level + 4;
+  const max = Math.round(hpAt(s, lvl) * 2.4);
+  return {
+    name: "Champion Owlite", emoji: "🦉👑", type: s.type, level: lvl,
+    hp: max, maxHp: max, atk: Math.round(atkAt(s, lvl) * 1.25), def: defAt(s, lvl) + 3,
+    xp: 120, coins: 200, boss: true
   };
 }
 
+/* ------------------------------------------------------------------ *
+ *  Battle
+ * ------------------------------------------------------------------ */
 function drawHand() {
   const hand = [];
-  for (let i=0; i<3; i++) {
-    hand.push(state.deck[Math.floor(Math.random()*state.deck.length)]);
-  }
+  for (let i = 0; i < 3; i++) hand.push(state.deck[Math.floor(Math.random() * state.deck.length)]);
   return hand;
 }
+function drawOne() { return state.deck[Math.floor(Math.random() * state.deck.length)]; }
 
-function startBattle(enemy=null, category=null) {
-  const mon = monsters[state.starter] || monsters.Flamink;
+function startBattle(enemy = null, category = null) {
+  if (!anyAlive()) { toast("Your whole team has fainted! Heal at the Lab."); return; }
+  if (active().hp <= 0) { state.activeIndex = state.party.findIndex(m => m.hp > 0); }
+
+  const e = enemy || randomEnemy();
+  markSeen(e.boss ? "Owlite" : e.name);
+
   battle = {
-    enemy: enemy || randomEnemy(),
-    hp: state.hp,
-    maxHp: state.maxHp,
-    energy: 2,
-    shield: 0,
-    chain: 0,
-    doubleNext: false,
-    hand: drawHand(),
-    category,
-    question:null,
-    answered:false,
-    log:[]
+    enemy: e, energy: 2, shield: 0, chain: 0, doubleNext: false,
+    hand: drawHand(), category, question: null, answered: false,
+    isBoss: !!e.boss, recentQ: [], bonusTime: 0, log: []
   };
 
+  document.getElementById("stage").classList.toggle("boss", battle.isBoss);
   document.getElementById("battleModal").classList.add("active");
-  document.getElementById("playerSprite").textContent = mon.emoji;
-  document.getElementById("enemySprite").textContent = battle.enemy.emoji;
   document.getElementById("returnBtn").style.display = "none";
   document.getElementById("nextBtn").style.display = "none";
+  document.getElementById("switchRow").style.display = "none";
+  battle.log.push(e.boss ? "The Champion steps forward!" : `A wild ${e.name} appeared!`);
 
   nextQuestion();
-  renderBattle();
 }
 
 function pickQuestion() {
   let pool = questions;
-  if (battle.category) pool = questions.filter(q => q.c === battle.category);
-  return pool[Math.floor(Math.random()*pool.length)];
+  if (battle.category) pool = pool.filter(q => q.c === battle.category);
+  // difficulty scales with active level; allow up to tier ceiling
+  const ceiling = active().level < 6 ? 2 : 3;
+  let tiered = pool.filter(q => q.d <= ceiling);
+  if (tiered.length) pool = tiered;
+  // avoid immediate repeats
+  const fresh = pool.filter(q => !battle.recentQ.includes(q.q));
+  const use = fresh.length ? fresh : pool;
+  const q = use[Math.floor(Math.random() * use.length)];
+  battle.recentQ.push(q.q);
+  if (battle.recentQ.length > 6) battle.recentQ.shift();
+  return q;
 }
 
 function nextQuestion() {
   battle.question = pickQuestion();
   battle.answered = false;
   document.getElementById("nextBtn").style.display = "none";
+  document.getElementById("switchRow").style.display = "none";
+  startTimer();
   renderBattle();
 }
 
+/* --- per-question timer --- */
+function startTimer() {
+  stopTimer();
+  battle.timeMax = 15 + (battle.bonusTime || 0);
+  battle.bonusTime = 0;
+  battle.timeLeft = battle.timeMax;
+  updateTimerBar();
+  battle.timerId = setInterval(() => {
+    battle.timeLeft -= 0.1;
+    if (battle.timeLeft <= 0) { battle.timeLeft = 0; updateTimerBar(); timeoutAnswer(); }
+    else updateTimerBar();
+  }, 100);
+}
+function stopTimer() { if (battle && battle.timerId) { clearInterval(battle.timerId); battle.timerId = null; } }
+function updateTimerBar() {
+  const bar = document.getElementById("timerBar");
+  const pct = Math.max(0, battle.timeLeft / battle.timeMax * 100);
+  bar.firstElementChild.style.width = pct + "%";
+  bar.classList.toggle("danger", pct < 33);
+}
+function timeoutAnswer() {
+  if (battle.answered) return;
+  stopTimer();
+  battle.answered = true;
+  battle.chain = 0;
+  battle.log.push("⏰ Time's up! The attack missed.");
+  sfx.wrong();
+  const buttons = document.querySelectorAll(".answer");
+  buttons.forEach((btn, index) => { btn.disabled = true; if (index === battle.question.correct) btn.classList.add("correct"); });
+  enemyAttack();
+  postAnswer();
+}
+
 function renderBattle() {
-  const mon = monsters[state.starter] || monsters.Flamink;
+  const a = active();
+  const s = species[a.name];
   const e = battle.enemy;
 
-  document.getElementById("enemyName").textContent = `${e.name} Lv. ${e.level}`;
-  document.getElementById("enemyHp").style.width = `${Math.max(0, e.hp/e.maxHp*100)}%`;
+  document.getElementById("playerSprite").textContent = s.emoji;
+  document.getElementById("enemySprite").textContent = e.emoji;
+
+  document.getElementById("enemyName").textContent = `${e.name} Lv.${e.level}`;
+  document.getElementById("enemyType").textContent = e.type;
+  document.getElementById("enemyType").className = "badge-type t-" + e.type;
+  setBar("enemyHp", e.hp, e.maxHp);
   document.getElementById("enemyHpText").textContent = `HP ${Math.max(0, Math.round(e.hp))} / ${e.maxHp}`;
 
-  document.getElementById("playerName").textContent = `${state.starter} Lv. ${state.level}`;
-  document.getElementById("playerHp").style.width = `${Math.max(0, battle.hp/battle.maxHp*100)}%`;
-  document.getElementById("energyBar").style.width = `${Math.min(100, battle.energy/8*100)}%`;
-  document.getElementById("playerHpText").textContent = `HP ${Math.max(0, Math.round(battle.hp))} / ${battle.maxHp} · Energy ${battle.energy}/8`;
+  document.getElementById("playerName").textContent = `${a.name} Lv.${a.level}`;
+  document.getElementById("playerType").textContent = s.type;
+  document.getElementById("playerType").className = "badge-type t-" + s.type;
+  setBar("playerHp", a.hp, a.maxHp);
+  document.getElementById("energyBar").style.width = `${Math.min(100, battle.energy / 8 * 100)}%`;
+  document.getElementById("playerHpText").textContent =
+    `HP ${Math.max(0, Math.round(a.hp))} / ${a.maxHp} · ⚡ ${battle.energy}/8` + (battle.shield ? ` · 🛡 ${battle.shield}` : "");
 
   const q = battle.question;
-  document.getElementById("questionMeta").textContent = `${q.c} · Knowledge Chain x${battle.chain}`;
+  const mult = typeMult(s.type, e.type);
+  const effTxt = mult > 1 ? " · ⚔️ super effective!" : mult < 1 ? " · resisted" : "";
+  document.getElementById("questionMeta").innerHTML =
+    `${q.c} · Tier ${q.d} · Chain x${battle.chain}<span style="color:#ffd166">${effTxt}</span>`;
   document.getElementById("questionText").textContent = q.q;
+  document.getElementById("answers").innerHTML = q.a.map((ans, i) =>
+    `<button class="answer" onclick="answer(${i})"><b>${i+1})</b> ${ans}</button>`).join("");
 
-  document.getElementById("answers").innerHTML = q.a.map((a,i) => `
-    <button class="answer" onclick="answer(${i})"><b>${String.fromCharCode(65+i)})</b> ${a}</button>
-  `).join("");
+  document.getElementById("catchBtn").disabled = battle.isBoss || state.balls <= 0 || battle.answered;
+  document.getElementById("catchBtn").textContent = `Catch 🔮 ${state.balls}`;
+  document.getElementById("potionBtn").disabled = state.potions <= 0 || battle.answered || active().hp >= active().maxHp;
+  document.getElementById("potionBtn").textContent = `Potion 🧪 ${state.potions}`;
+  document.getElementById("switchBtn").disabled = state.party.filter(m => m.hp > 0).length <= 1 || battle.answered;
 
-  document.getElementById("hand").innerHTML = battle.hand.map((name,i) => {
+  document.getElementById("cardHint").textContent = "Play before answering — cards are free.";
+  document.getElementById("hand").innerHTML = battle.hand.map((name, i) => {
     const c = cards[name];
-    return `
-      <button class="battle-card" onclick="playCard(${i})" ${battle.energy < c.cost ? "disabled" : ""}>
+    return `<button class="battle-card" onclick="playCard(${i})" ${battle.energy < c.cost || battle.answered ? "disabled" : ""}>
         <b>${name}</b>
-        <div class="small">${c.rarity}</div>
-        <div class="small">Cost ${c.cost}</div>
+        <div class="small r r-${c.rarity}">${c.rarity} · ⚡${c.cost}</div>
         <div class="small">${c.text}</div>
-      </button>
-    `;
+      </button>`;
   }).join("");
 
-  document.getElementById("battleLog").innerHTML = battle.log.slice(-7).map(x => `<div>${x}</div>`).join("");
+  document.getElementById("battleLog").innerHTML = battle.log.slice(-8).map(x => `<div>${x}</div>`).join("");
+  const bl = document.getElementById("battleLog"); bl.scrollTop = bl.scrollHeight;
+}
+function setBar(id, hp, max) {
+  const el = document.getElementById(id);
+  const pct = Math.max(0, hp / max * 100);
+  el.style.width = pct + "%";
+  el.classList.toggle("low", pct < 30);
 }
 
 function answer(i) {
   if (battle.answered) return;
   battle.answered = true;
+  stopTimer();
 
   const q = battle.question;
+  const a = active();
+  const s = species[a.name];
   const buttons = document.querySelectorAll(".answer");
-
   buttons.forEach((btn, index) => {
     btn.disabled = true;
     if (index === q.correct) btn.classList.add("correct");
@@ -1021,221 +1360,337 @@ function answer(i) {
     state.bestChain = Math.max(state.bestChain, battle.chain);
     battle.energy = Math.min(8, battle.energy + 2);
 
-    let damage = monAttack() + battle.chain * 2;
-    if (battle.doubleNext) {
-      damage *= 2;
-      battle.doubleNext = false;
-    }
+    // speed bonus from remaining time
+    const speedBonus = Math.round(battle.timeLeft / battle.timeMax * 8);
+    let base = atkAt(s, a.level) + a.level + Math.round(battle.chain * 1.5) + speedBonus;
+    if (a.name === "Flamink" && battle.chain >= 3) base += 7;
+    const mult = typeMult(s.type, battle.enemy.type);
+    let damage = Math.max(1, Math.round(base * mult - battle.enemy.def));
+    if (battle.doubleNext) { damage *= 2; battle.doubleNext = false; battle.log.push("Double Damage triggered!"); }
 
     battle.enemy.hp -= damage;
-    battle.log.push(`Correct! You dealt ${damage} damage.`);
+    sfx.correct();
+    attackAnim("playerSprite", "p");
+    setTimeout(() => { hitAnim("enemySprite"); floatNum("enemySprite", "-" + damage, "#ffe27a"); }, 140);
+    battle.log.push(`✅ Correct! ${a.name} dealt ${damage}${mult>1?" (super!)":mult<1?" (resisted)":""}.`);
 
-    if (state.starter === "Aquabbit" && battle.chain % 2 === 0) {
-      battle.hp = Math.min(battle.maxHp, battle.hp + 8);
-      battle.log.push("Aquabbit healed 8 HP.");
+    if (a.name === "Aquabbit" && battle.chain % 2 === 0 && a.hp < a.maxHp) {
+      a.hp = Math.min(a.maxHp, a.hp + 8); battle.log.push("💧 Aquabbit healed 8 HP.");
+    }
+    if (a.name === "Leafling" && q.c === "Vocabulary" && a.hp < a.maxHp) {
+      a.hp = Math.min(a.maxHp, a.hp + 10); battle.log.push("🌿 Leafling healed 10 HP from vocabulary.");
     }
 
-    if (state.starter === "Leafling" && q.c === "Vocabulary") {
-      battle.hp = Math.min(battle.maxHp, battle.hp + 10);
-      battle.log.push("Leafling healed 10 HP from vocabulary power.");
-    }
-
-    if (battle.enemy.hp <= 0) return winBattle();
-
+    if (battle.enemy.hp <= 0) { renderBattle(); return setTimeout(winBattle, 350); }
   } else {
     battle.chain = 0;
-    battle.log.push(`Wrong. Correct answer: ${q.a[q.correct]}.`);
+    battle.log.push(`❌ Wrong. Answer: ${q.a[q.correct]}.`);
+    sfx.wrong();
     enemyAttack();
   }
+  postAnswer();
+}
 
+function postAnswer() {
+  if (active().hp <= 0) return handleFaint();
   document.getElementById("nextBtn").style.display = "inline-block";
   renderBattle();
 }
 
-function monAttack() {
-  const mon = monsters[state.starter] || monsters.Flamink;
-  let dmg = mon.atk + state.level * 2;
-  if (state.starter === "Flamink" && battle.chain >= 3) dmg += 7;
-  return Math.max(1, Math.round(dmg - battle.enemy.def));
-}
-
 function enemyAttack() {
-  const mon = monsters[state.starter] || monsters.Flamink;
-  let dmg = Math.max(1, battle.enemy.atk - mon.def);
+  const a = active();
+  const s = species[a.name];
+  const mult = typeMult(battle.enemy.type, s.type);
+  let dmg = Math.max(1, Math.round(battle.enemy.atk * mult - defAt(s, a.level)));
 
   if (battle.shield > 0) {
     const block = Math.min(battle.shield, dmg);
-    battle.shield -= block;
-    dmg -= block;
-    battle.log.push(`Shield blocked ${block} damage.`);
+    battle.shield -= block; dmg -= block;
+    battle.log.push(`🛡 Shield blocked ${block}.`);
   }
-
   if (dmg > 0) {
-    battle.hp -= dmg;
-    battle.log.push(`${battle.enemy.name} hit you for ${dmg}.`);
+    a.hp -= dmg;
+    attackAnim("enemySprite", "e");
+    setTimeout(() => { hitAnim("playerSprite"); floatNum("playerSprite", "-" + dmg, "#ff8a8a"); shakeStage(); }, 140);
+    sfx.hit();
+    battle.log.push(`💥 ${battle.enemy.name} hit ${a.name} for ${dmg}.`);
   }
-
-  if (battle.hp <= 0) loseBattle();
 }
 
 function playCard(i) {
   const name = battle.hand[i];
   const card = cards[name];
   if (!card || battle.energy < card.cost || battle.answered) return;
+  const a = active();
 
   battle.energy -= card.cost;
-  battle.hand.splice(i,1);
-  battle.hand.push(state.deck[Math.floor(Math.random()*state.deck.length)]);
+  battle.hand.splice(i, 1);
+  battle.hand.push(drawOne());
 
   if (card.effect === "damage") {
     battle.enemy.hp -= card.power;
-    battle.log.push(`${name} dealt ${card.power} damage.`);
-  }
-
-  if (card.effect === "shield") {
-    battle.shield += card.power;
-    battle.log.push(`${name} added ${card.power} shield.`);
-  }
-
-  if (card.effect === "heal") {
-    battle.hp = Math.min(battle.maxHp, battle.hp + card.power);
-    battle.log.push(`${name} healed ${card.power} HP.`);
-  }
-
-  if (card.effect === "word") {
-    let dmg = card.power;
-    if (battle.question.c === "Vocabulary") dmg += 10;
+    attackAnim("playerSprite", "p");
+    setTimeout(() => { hitAnim("enemySprite"); floatNum("enemySprite", "-" + card.power, "#9ad0ff"); }, 120);
+    battle.log.push(`🎴 ${name} dealt ${card.power}.`);
+  } else if (card.effect === "shield") {
+    battle.shield += card.power; battle.log.push(`🎴 ${name}: +${card.power} shield.`);
+  } else if (card.effect === "heal") {
+    a.hp = Math.min(a.maxHp, a.hp + card.power); sfx.heal();
+    floatNum("playerSprite", "+" + card.power, "#8affa8");
+    battle.log.push(`🎴 ${name} healed ${card.power}.`);
+  } else if (card.effect === "word") {
+    let dmg = card.power + (battle.question.c === "Vocabulary" ? 12 : 0);
     battle.enemy.hp -= dmg;
-    battle.log.push(`${name} dealt ${dmg} damage.`);
+    setTimeout(() => { hitAnim("enemySprite"); floatNum("enemySprite", "-" + dmg, "#9ad0ff"); }, 120);
+    battle.log.push(`🎴 ${name} dealt ${dmg}.`);
+  } else if (card.effect === "double") {
+    battle.doubleNext = true; battle.log.push("🎴 Next correct answer deals double.");
+  } else if (card.effect === "focus") {
+    battle.bonusTime += card.power; battle.timeLeft += card.power; battle.timeMax += card.power;
+    updateTimerBar(); battle.log.push(`🎴 Focus: +${card.power}s this question.`);
+  } else if (card.effect === "surge") {
+    battle.energy = Math.min(8, battle.energy + 3); battle.hand.push(drawOne());
+    battle.log.push("🎴 Knowledge Surge: +3 energy, drew a card.");
   }
 
-  if (card.effect === "double") {
-    battle.doubleNext = true;
-    battle.log.push("Next correct answer will deal double damage.");
-  }
-
-  if (card.effect === "surge") {
-    battle.energy = Math.min(8, battle.energy + 3);
-    battle.hand.push(...drawHand().slice(0,2));
-    battle.log.push("Knowledge Surge restored energy and drew cards.");
-  }
-
-  if (battle.enemy.hp <= 0) return winBattle();
-
+  if (battle.enemy.hp <= 0) { renderBattle(); return setTimeout(winBattle, 300); }
   renderBattle();
 }
 
-function winBattle() {
+/* --- catch / potion / switch --- */
+function attemptCatch() {
+  if (battle.isBoss) { toast("You can't catch the Champion!"); return; }
+  if (state.balls <= 0 || battle.answered) return;
+  state.balls--;
   const e = battle.enemy;
+  const hpFrac = Math.max(0, e.hp / e.maxHp);
+  let chance = 0.12 + (1 - hpFrac) * 0.65 + Math.min(0.18, battle.chain * 0.03);
+  battle.answered = true; stopTimer();
+  document.querySelectorAll(".answer").forEach(b => b.disabled = true);
+
+  if (Math.random() < chance) {
+    sfx.catch();
+    markCaught(e.name);
+    const caught = makeMon(e.name, e.level);
+    if (state.party.length < 6) {
+      state.party.push(caught);
+      battle.log.push(`🔮 Gotcha! ${e.name} joined your team!`);
+      logMsg(`Caught ${e.name} (Lv.${e.level})!`);
+    } else {
+      state.coins += 40;
+      battle.log.push(`🔮 Caught ${e.name}! Team full — sent to the Lab (+40🪙).`);
+      logMsg(`Caught ${e.name} — team full, +40 coins.`);
+    }
+    toast(`Caught ${e.name}!`);
+    state.wins++;               // catching counts toward progress
+    endBattle(true, `You caught ${e.name}!`);
+  } else {
+    sfx.fail();
+    battle.log.push(`🔮 Oh no — ${e.name} broke free! (balls left: ${state.balls})`);
+    enemyAttack();
+    postAnswer();
+  }
+  updateUI();
+}
+
+function usePotion() {
+  if (state.potions <= 0 || battle.answered) return;
+  const a = active();
+  if (a.hp >= a.maxHp) { toast("HP already full."); return; }
+  state.potions--;
+  const heal = Math.round(a.maxHp * 0.5);
+  a.hp = Math.min(a.maxHp, a.hp + heal);
+  sfx.heal();
+  floatNum("playerSprite", "+" + heal, "#8affa8");
+  battle.log.push(`🧪 Potion restored ${heal} HP.`);
+  battle.answered = true; stopTimer();
+  document.querySelectorAll(".answer").forEach(b => b.disabled = true);
+  enemyAttack();                 // using an item gives the enemy a turn
+  postAnswer();
+  updateUI();
+}
+
+function toggleSwitch() {
+  const row = document.getElementById("switchRow");
+  const open = row.style.display !== "none";
+  if (open) { row.style.display = "none"; return; }
+  const options = state.party.map((m, i) => {
+    if (i === state.activeIndex || m.hp <= 0) return "";
+    const s = species[m.name];
+    return `<button class="ghost" style="flex:1;min-width:120px" onclick="switchMon(${i})">${s.emoji} ${m.name} · ${Math.round(m.hp)}/${m.maxHp}</button>`;
+  }).join("");
+  row.innerHTML = `<div class="small" style="margin-bottom:6px">Switch (the enemy gets a free hit):</div><div style="display:flex;gap:8px;flex-wrap:wrap">${options}</div>`;
+  row.style.display = "block";
+}
+function switchMon(i) {
+  if (battle.answered || state.party[i].hp <= 0) return;
+  const old = active().name;
+  state.activeIndex = i;
+  document.getElementById("switchRow").style.display = "none";
+  battle.log.push(`🔁 ${old} withdrawn — go, ${active().name}!`);
+  battle.answered = true; stopTimer();
+  document.querySelectorAll(".answer").forEach(b => b.disabled = true);
+  enemyAttack();
+  postAnswer();
+  updateUI();
+}
+
+function handleFaint() {
+  const a = active();
+  a.hp = 0;
+  battle.log.push(`💀 ${a.name} fainted!`);
+  if (anyAlive()) {
+    const next = state.party.findIndex(m => m.hp > 0);
+    state.activeIndex = next;
+    battle.log.push(`Go, ${active().name}!`);
+    battle.shield = 0;
+    document.getElementById("nextBtn").style.display = "inline-block";
+    renderBattle();
+    updateUI();
+    toast(`${a.name} fainted — sent out ${active().name}`);
+  } else {
+    loseBattle();
+  }
+}
+
+function winBattle() {
+  stopTimer();
+  const e = battle.enemy;
+  const a = active();
   const xp = e.xp + battle.chain * 3;
   const coins = e.coins + battle.chain * 2;
-
-  addXp(xp);
+  addXp(a, xp);
   state.coins += coins;
   state.wins++;
-  state.hp = Math.max(1, Math.round(battle.hp));
+  sfx.win();
 
-  if (battle.chain >= 5) {
-    state.packs++;
-    state.log.push("Knowledge Chain bonus: earned a Bronze Pack.");
+  if (battle.chain >= 5 && !e.boss) { state.packs++; battle.log.push("🔥 Chain 5+ bonus: a Battle Pack!"); }
+  battle.log.push(`🏆 Victory! +${xp} XP, +${coins}🪙.`);
+  logMsg(`Defeated ${e.name}. +${xp} XP, +${coins}🪙.`);
+
+  if (e.boss) {
+    state.badges = 1;
+    state.coins += 100; state.packs += 2;
+    logMsg("👑 You defeated the Champion and earned the Knowledge Badge!");
+    endBattle(true);
+    showWin("🏆", "Champion Defeated!", "You beat the Champion and claimed the Knowledge Badge! The Crystal of Knowledge is whole again. Keep catching QuizMons to complete your Dex.");
+    return;
   }
-
-  state.log.push(`Defeated ${e.name}. Earned ${xp} XP and ${coins} coins.`);
-  battle.log.push(`Victory! +${xp} XP, +${coins} coins.`);
-
-  finishBattle();
+  endBattle(true);
 }
 
 function loseBattle() {
-  state.hp = Math.round(state.maxHp * .5);
+  stopTimer();
   state.coins = Math.max(0, state.coins - 10);
-  state.log.push("You lost the battle and dropped 10 coins.");
-  battle.log.push("Defeat. Visit the lab to heal.");
-
-  finishBattle();
+  battle.log.push("Your team fainted. You scramble back to safety.");
+  logMsg("Your team fainted — lost 10🪙. Heal at the Lab.");
+  endBattle(false);
 }
 
-function finishBattle() {
+function endBattle(won, note) {
+  document.getElementById("nextBtn").style.display = "none";
+  document.getElementById("switchRow").style.display = "none";
+  document.getElementById("returnBtn").style.display = "inline-block";
+  if (note) battle.log.push(note);
   save();
   updateUI();
-  document.getElementById("nextBtn").style.display = "none";
-  document.getElementById("returnBtn").style.display = "inline-block";
   renderBattle();
 }
 
 function runAway() {
-  state.hp = Math.max(1, Math.round(battle.hp));
-  state.log.push("You ran from battle.");
+  if (battle.isBoss) { toast("No running from the Champion!"); return; }
+  stopTimer();
+  logMsg("You ran from the battle.");
   closeBattle();
 }
-
 function closeBattle() {
+  stopTimer();
   battle = null;
   document.getElementById("battleModal").classList.remove("active");
   renderMap();
   updateUI();
   save();
 }
+function startBoss() {
+  logMsg("You challenge the Champion!");
+  startBattle(bossEnemy());
+}
 
-function buyPack() {
-  if (state.coins < 75) {
-    state.log.push("Not enough coins. Bronze Packs cost 75.");
-    updateUI();
-    return;
-  }
+/* ------------------------------------------------------------------ *
+ *  Win modal
+ * ------------------------------------------------------------------ */
+function showWin(art, title, text) {
+  document.getElementById("winArt").textContent = art;
+  document.getElementById("winTitle").textContent = title;
+  document.getElementById("winText").textContent = text;
+  document.getElementById("winModal").classList.add("active");
+}
+function closeWin() {
+  document.getElementById("winModal").classList.remove("active");
+  if (battle) closeBattle();
+}
 
-  state.coins -= 75;
-  state.packs++;
-  state.log.push("Bought a Bronze Pack.");
-  updateUI();
-  save();
+/* ------------------------------------------------------------------ *
+ *  Shop / packs
+ * ------------------------------------------------------------------ */
+function buyPack()  { buyItem(75, () => { state.packs++;  }, "Bought a Battle Pack."); }
+function buyPotion(){ buyItem(40, () => { state.potions++; }, "Bought a Potion."); }
+function buyBall()  { buyItem(30, () => { state.balls++;  }, "Bought a Quiz Ball."); }
+function buyItem(cost, fn, msg) {
+  if (state.coins < cost) { toast(`Not enough coins (need ${cost}🪙).`); return; }
+  state.coins -= cost; fn(); sfx.coin();
+  logMsg(msg); updateUI(); save();
 }
 
 function openPack() {
-  if (state.packs <= 0) {
-    state.log.push("No packs available.");
-    updateUI();
-    return;
-  }
-
+  if (state.packs <= 0) { toast("No packs to open. Buy one for 75🪙."); return; }
   state.packs--;
-
   const pool = [
-    "Quick Strike","Quick Strike","Shield","Leaf Heal",
+    "Quick Strike","Quick Strike","Shield","Leaf Heal","Focus",
     "Word Spark","Word Spark","Double Damage",
-    "Fire Blast","Knowledge Surge","Legend Beam"
+    "Fire Blast","Knowledge Surge","Knowledge Surge","Legend Beam"
   ];
-
   const opened = [];
-  for (let i=0; i<5; i++) {
-    let name = pool[Math.floor(Math.random()*pool.length)];
-    opened.push(name);
-    state.deck.push(name);
-  }
-
+  for (let i = 0; i < 5; i++) { const n = pool[Math.floor(Math.random() * pool.length)]; opened.push(n); state.deck.push(n); }
   document.getElementById("packResults").innerHTML = opened.map(name => {
     const c = cards[name];
-    return `
-      <div class="pack-card">
+    return `<div class="pack-card">
         <b>${name}</b>
-        <div class="small">${c.rarity}</div>
-        <br>
-        <div class="small">${c.text}</div>
-      </div>
-    `;
+        <div class="small r r-${c.rarity}">${c.rarity}</div><br>
+        <div class="small">⚡${c.cost} · ${c.text}</div>
+      </div>`;
   }).join("");
-
   document.getElementById("packModal").classList.add("active");
-  state.log.push(`Opened pack: ${opened.join(", ")}.`);
-  updateUI();
-  save();
+  sfx.coin();
+  logMsg(`Opened a pack: ${opened.join(", ")}.`);
+  updateUI(); save();
 }
+function closePack() { document.getElementById("packModal").classList.remove("active"); }
 
-function closePack() {
-  document.getElementById("packModal").classList.remove("active");
+/* ------------------------------------------------------------------ *
+ *  Dex
+ * ------------------------------------------------------------------ */
+function showDex() {
+  const names = Object.keys(species);
+  document.getElementById("dexCount").textContent = `${state.caught.length} caught · ${state.seen.length} seen · ${names.length} total`;
+  document.getElementById("dexGrid").innerHTML = names.map(name => {
+    const s = species[name];
+    const caught = state.caught.includes(name);
+    const seen = state.seen.includes(name);
+    if (!seen) return `<div class="dex-card unknown"><div class="e">❓</div><b>???</b></div>`;
+    return `<div class="dex-card"><div class="e">${s.emoji}</div><b>${name}</b>
+      <div class="small"><span class="badge-type t-${s.type}">${s.type}</span></div>
+      <div class="small">${caught ? "✅ Caught" : "👁 Seen"}</div></div>`;
+  }).join("");
+  document.getElementById("dexModal").classList.add("active");
 }
+function closeDex() { document.getElementById("dexModal").classList.remove("active"); }
 
+/* ------------------------------------------------------------------ *
+ *  Init
+ * ------------------------------------------------------------------ */
 if (load()) {
+  document.getElementById("muteBtn").textContent = state.muted ? "🔇" : "🔊";
   updateUI();
 }
 </script>
