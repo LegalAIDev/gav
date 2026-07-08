@@ -1,0 +1,21 @@
+{
+  "name": "quizmon-overworld",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Overworld RPG base (Phaser 3) for QuizMon. Built on the MIT-licensed Monster Tamer tutorial codebase as a development starting point.",
+  "scripts": {
+    "fetch-assets": "node scripts/fetch-assets.mjs",
+    "postinstall": "node scripts/fetch-assets.mjs || true",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "phaser": "3.60.0",
+    "webfontloader": "1.6.28"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0"
+  }
+}

@@ -1,0 +1,15 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+
+# fetched dev-only assets (Monster Tamer art/audio — NOT redistributed).
+# Pulled by `npm run fetch-assets`. Replace with your own before production.
+public/assets/images/
+public/assets/audio/
+.asset-cache/
+
+# editor / OS
+.DS_Store
+*.log
