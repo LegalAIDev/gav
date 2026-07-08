@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>QuizMon Arena Prototype</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background:
+      radial-gradient(circle at top left, rgba(255, 220, 120, .25), transparent 35%),
+      linear-gradient(180deg, #102642, #06121f);
+    color: white;
+    overflow: hidden;
+  }
+
+  button {
+    border: 0;
+    border-radius: 14px;
+    padding: 12px 16px;
+    font-weight: 800;
+    cursor: pointer;
+    color: white;
+    background: linear-gradient(180deg, #3a86ff, #1d4fa3);
+    box-shadow: 0 4px 0 rgba(0,0,0,.35);
+  }
+
+  button:hover { filter: brightness(1.1); }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+
+  .screen {
+    display: none;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  .active { display: block; }
+
+  #menu {
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 20% 15%, #ffeaa0 0 45px, transparent 46px),
+      linear-gradient(180deg, #77c8ff 0%, #62b7e8 38%, #6ab85f 39%, #27643b 100%);
+  }
+
+  #menu::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(135deg, transparent 0 58%, rgba(20, 75, 70, .8) 59% 64%, transparent 65%) 0 250px / 330px 140px repeat-x,
+      linear-gradient(45deg, transparent 0 58%, rgba(18, 92, 55, .8) 59% 64%, transparent 65%) 80px 300px / 380px 170px repeat-x;
+  }
+
+  .menu-card {
+    position: relative;
+    z-index: 1;
+    width: min(900px, calc(100vw - 32px));
+    margin: 7vh auto;
+    padding: 28px;
+    border-radius: 28px;
+    background: rgba(7, 18, 34, .75);
+    border: 1px solid rgba(255,255,255,.25);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 30px 80px rgba(0,0,0,.35);
+    display: grid;
+    grid-template-columns: 1.2fr .8fr;
+    gap: 24px;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(48px, 9vw, 92px);
+    line-height: .9;
+    letter-spacing: -5px;
+    text-shadow: 0 8px 0 rgba(0,0,0,.25);
+  }
+
+  .subtitle {
+    color: #d9efff;
+    font-size: 18px;
+    line-height: 1.5;
+    margin-top: 18px;
+  }
+
+  .scene {
+    height: 230px;
+    margin-top: 24px;
+    border-radius: 22px;
+    border: 1px solid rgba(255,255,255,.25);
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 18% 20%, #fff0a8 0 30px, transparent 31px),
+      linear-gradient(180deg, #85d6ff 0 48%, #5dbb65 49% 100%);
+    position: relative;
+  }
+
+  .scene::after {
+    content: "";
+    position: absolute;
+    left: 38%;
+    bottom: 36px;
+    width: 110px;
+    height: 88px;
+    background:
+      linear-gradient(45deg, transparent 0 45%, #b65f38 46% 55%, transparent 56%) top / 110px 45px no-repeat,
+      linear-gradient(#f6d99b, #d7975d);
+    border: 4px solid rgba(0,0,0,.25);
+  }
+
+  .menu-buttons {
+    display: grid;
+    gap: 12px;
+    align-content: center;
+  }
+
+  .green { background: linear-gradient(180deg, #51cf66, #259447); }
+  .gold { background: linear-gradient(180deg, #ffd166, #c87b22); }
+  .purple { background: linear-gradient(180deg, #a66cff, #6935c8); }
+  .red { background: linear-gradient(180deg, #ff6868, #b63434); }
+  .ghost { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2); }
+
+  #starter {
+    padding: 26px;
+    background:
+      radial-gradient(circle at top, rgba(255,210,100,.18), transparent 35%),
+      linear-gradient(180deg, #102642, #081522);
+  }
+
+  .starter-box {
+    max-width: 1050px;
+    margin: 0 auto;
+    padding: 24px;
+    border-radius: 28px;
+    background: rgba(10, 23, 40, .9);
+    border: 1px solid rgba(255,255,255,.18);
+  }
+
+  .dialogue {
+    background: rgba(255,255,255,.1);
+    padding: 18px;
+    border-radius: 18px;
+    line-height: 1.5;
+    margin-bottom: 18px;
+  }
+
+  .starter-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .starter-card {
+    background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 22px;
+    padding: 18px;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  .starter-card:hover {
+    transform: translateY(-4px);
+    border-color: #ffd166;
+  }
+
+  .monster {
+    font-size: 70px;
+    filter: drop-shadow(0 10px 0 rgba(0,0,0,.25));
+  }
+
+  .small {
+    color: #b9d3e8;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  #game {
+    display: none;
+    grid-template-rows: auto 1fr;
+    height: 100vh;
+  }
+
+  #game.active { display: grid; }
+
+  .topbar {
+    padding: 12px 16px;
+    background: rgba(5, 14, 25, .9);
+    border-bottom: 1px solid rgba(255,255,255,.12);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .topbar strong {
+    font-size: 22px;
+  }
+
+  .stats {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .pill {
+    padding: 7px 11px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.15);
+    font-size: 14px;
+    font-weight: 800;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 330px;
+    gap: 14px;
+    padding: 14px;
+    min-height: 0;
+  }
+
+  .map-panel, .side-panel {
+    background: rgba(7, 18, 34, .75);
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: 24px;
+    padding: 14px;
+    min-height: 0;
+  }
+
+  .location {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  #map {
+    display: grid;
+    grid-template-columns: repeat(14, 1fr);
+    gap: 2px;
+    width: min(100%, 720px);
+    aspect-ratio: 14 / 10;
+    margin: 0 auto;
+    background: rgba(0,0,0,.25);
+    padding: 8px;
+    border-radius: 18px;
+  }
+
+  .tile {
+    position: relative;
+    border-radius: 5px;
+    min-height: 42px;
+    image-rendering: pixelated;
+  }
+
+  .grass { background: #65b85f; }
+  .path { background: #d2a85e; }
+  .tree { background: linear-gradient(180deg, #287a41 0 68%, #5b3b25 69%); }
+  .water { background: linear-gradient(135deg, #2381d1, #52c3ff); }
+  .tall { background: repeating-linear-gradient(90deg, #4da853 0 6px, #2f8847 7px 12px); }
+  .lab { background: linear-gradient(180deg, #8d63ff 0 35%, #f2dcff 36%); }
+  .shop { background: linear-gradient(180deg, #e68a32 0 35%, #ffe0a1 36%); }
+  .arena { background: linear-gradient(180deg, #bd4343 0 35%, #eee 36%); }
+  .sign { background: #65b85f; }
+  .sign::after { content: "🪧"; position: absolute; inset: 0; display: grid; place-items: center; }
+  .flower { background: #65b85f; }
+  .flower::after { content: "✿"; position: absolute; inset: 0; display: grid; place-items: center; color: #ffd1ff; }
+
+  .player {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-size: 25px;
+    z-index: 2;
+    filter: drop-shadow(0 5px 0 rgba(0,0,0,.35));
+  }
+
+  .side-panel {
+    display: grid;
+    gap: 12px;
+    grid-template-rows: auto auto auto 1fr;
+  }
+
+  .card {
+    padding: 14px;
+    border-radius: 18px;
+    background: rgba(255,255,255,.09);
+    border: 1px solid rgba(255,255,255,.13);
+  }
+
+  .card h3 { margin: 0 0 8px; }
+
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  #log {
+    height: 150px;
+    overflow: auto;
+    background: rgba(0,0,0,.2);
+    border-radius: 14px;
+    padding: 10px;
+    font-size: 13px;
+  }
+
+  .modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    place-items: center;
+    background: rgba(0,0,0,.72);
+    z-index: 10;
+    padding: 18px;
+  }
+
+  .modal.active { display: grid; }
+
+  .modal-card {
+    width: min(1050px, 100%);
+    max-height: 92vh;
+    overflow: auto;
+    padding: 20px;
+    border-radius: 26px;
+    background: linear-gradient(180deg, #173455, #071321);
+    border: 1px solid rgba(255,255,255,.2);
+    box-shadow: 0 30px 90px rgba(0,0,0,.5);
+  }
+
+  .battle-grid {
+    display: grid;
+    grid-template-columns: .95fr 1.05fr;
+    gap: 18px;
+  }
+
+  .stage {
+    min-height: 420px;
+    border-radius: 22px;
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse at 72% 42%, rgba(255,255,255,.35), transparent 18%),
+      radial-gradient(ellipse at 28% 75%, rgba(255,255,255,.35), transparent 22%),
+      linear-gradient(180deg, #83d5ff 0 48%, #6dc264 49%);
+    border: 1px solid rgba(255,255,255,.16);
+  }
+
+  .battle-monster {
+    position: absolute;
+    font-size: 92px;
+    filter: drop-shadow(0 14px 0 rgba(0,0,0,.28));
+  }
+
+  #enemySprite { right: 70px; top: 90px; }
+  #playerSprite { left: 70px; bottom: 60px; }
+
+  .hpbox {
+    position: absolute;
+    background: rgba(7,18,34,.82);
+    padding: 10px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,.16);
+    min-width: 210px;
+  }
+
+  .enemybox { right: 18px; top: 18px; }
+  .playerbox { left: 18px; bottom: 18px; }
+
+  .bar {
+    height: 13px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.15);
+    overflow: hidden;
+    margin-top: 7px;
+  }
+
+  .fill {
+    height: 100%;
+    background: linear-gradient(90deg, #43d36b, #d2ff66);
+    width: 100%;
+  }
+
+  .energy .fill {
+    background: linear-gradient(90deg, #53c8ff, #bc85ff);
+  }
+
+  .question {
+    background: rgba(255,255,255,.09);
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: 20px;
+    padding: 16px;
+  }
+
+  .answers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+  }
+
+  .answer {
+    background: rgba(255,255,255,.12);
+    text-align: left;
+    min-height: 58px;
+    box-shadow: none;
+    border: 1px solid rgba(255,255,255,.15);
+  }
+
+  .correct { background: linear-gradient(180deg, #4fd46c, #238d45) !important; }
+  .wrong { background: linear-gradient(180deg, #ff6b6b, #b83131) !important; }
+
+  .hand {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 9px;
+    margin-top: 12px;
+  }
+
+  .battle-card {
+    background: rgba(255,255,255,.11);
+    border: 1px solid rgba(255,255,255,.16);
+    padding: 10px;
+    min-height: 115px;
+    text-align: left;
+  }
+
+  .battle-log {
+    margin-top: 12px;
+    height: 105px;
+    overflow: auto;
+    background: rgba(0,0,0,.22);
+    border-radius: 14px;
+    padding: 10px;
+    font-size: 13px;
+  }
+
+  .pack-results {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .pack-card {
+    background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.16);
+    border-radius: 18px;
+    padding: 12px;
+    min-height: 145px;
+  }
+
+  @media (max-width: 900px) {
+    body { overflow: auto; }
+    .menu-card, .layout, .battle-grid, .starter-grid { grid-template-columns: 1fr; }
+    #game { height: auto; min-height: 100vh; }
+    .answers, .hand, .pack-results { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<section id="menu" class="screen active">
+  <div class="menu-card">
+    <div>
+      <h1>QuizMon<br>Arena</h1>
+      <div class="subtitle">
+        Explore a pixel world, answer vocabulary and knowledge questions, battle wild QuizMons, level up, earn coins, and open Battle Packs.
+      </div>
+      <div class="scene"></div>
+    </div>
+    <div class="menu-buttons">
+      <button class="green" onclick="startNew()">New Game</button>
+      <button onclick="continueGame()">Continue</button>
+      <button class="purple" onclick="quickBattle()">Quick Test Battle</button>
+      <button class="ghost" onclick="resetSave()">Reset Save</button>
+    </div>
+  </div>
+</section>
+
+<section id="starter" class="screen">
+  <div class="starter-box">
+    <div class="dialogue">
+      <b>Professor Lex:</b> The Crystal of Knowledge has shattered. Choose your first QuizMon. Correct answers will power your attacks.
+    </div>
+
+    <div class="starter-grid">
+      <div class="starter-card" onclick="chooseStarter('Flamink')">
+        <div class="monster">🔥🦊</div>
+        <h2>Flamink</h2>
+        <p><b>Fire Type</b></p>
+        <p class="small">Fast attacker. Bonus damage after answer streaks.</p>
+      </div>
+
+      <div class="starter-card" onclick="chooseStarter('Aquabbit')">
+        <div class="monster">💧🐰</div>
+        <h2>Aquabbit</h2>
+        <p><b>Water Type</b></p>
+        <p class="small">Balanced defender. Heals after correct answers.</p>
+      </div>
+
+      <div class="starter-card" onclick="chooseStarter('Leafling')">
+        <div class="monster">🌿🦎</div>
+        <h2>Leafling</h2>
+        <p><b>Nature Type</b></p>
+        <p class="small">Healing specialist. Strong in vocabulary battles.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="game" class="screen">
+  <div class="topbar">
+    <strong>QuizMon Arena</strong>
+    <div class="stats">
+      <div class="pill" id="levelText">Lv. 1</div>
+      <div class="pill" id="xpText">XP 0 / 100</div>
+      <div class="pill" id="coinText">Coins 0</div>
+      <div class="pill" id="packText">Packs 0</div>
+      <div class="pill" id="chainText">Best Chain 0</div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="map-panel">
+      <div class="location">
+        <div>
+          <h2 id="locationName" style="margin:0;">Oakridge Village</h2>
+          <div class="small" id="locationHint">Use arrow keys or WASD. Press E to interact.</div>
+        </div>
+        <button class="gold" onclick="interact()">Interact</button>
+      </div>
+      <div id="map"></div>
+    </div>
+
+    <div class="side-panel">
+      <div class="card">
+        <h3>Party</h3>
+        <div id="party"></div>
+      </div>
+
+      <div class="card">
+        <h3>Quest</h3>
+        <div class="small" id="quest">Win 3 battles, then challenge Professor Lex in the arena.</div>
+      </div>
+
+      <div class="card">
+        <h3>Battle Pack / Deck</h3>
+        <div class="small" id="deckText"></div>
+        <br>
+        <div class="actions">
+          <button class="gold" onclick="openPack()">Open Pack</button>
+          <button class="green" onclick="buyPack()">Buy Pack</button>
+          <button class="purple" onclick="startBattle(null, 'Vocabulary')">Vocab Battle</button>
+          <button class="ghost" onclick="heal()">Heal</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Log</h3>
+        <div id="log"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="battleModal" class="modal">
+  <div class="modal-card">
+    <div class="battle-grid">
+      <div class="stage">
+        <div class="hpbox enemybox">
+          <b id="enemyName">Enemy</b>
+          <div class="bar"><div class="fill" id="enemyHp"></div></div>
+          <div class="small" id="enemyHpText"></div>
+        </div>
+
+        <div class="hpbox playerbox">
+          <b id="playerName">Player</b>
+          <div class="bar"><div class="fill" id="playerHp"></div></div>
+          <div class="bar energy"><div class="fill" id="energyBar"></div></div>
+          <div class="small" id="playerHpText"></div>
+        </div>
+
+        <div id="enemySprite" class="battle-monster"></div>
+        <div id="playerSprite" class="battle-monster"></div>
+      </div>
+
+      <div>
+        <div class="question">
+          <div class="small" id="questionMeta"></div>
+          <h2 id="questionText"></h2>
+          <div class="answers" id="answers"></div>
+        </div>
+
+        <h3>Battle Cards</h3>
+        <div class="hand" id="hand"></div>
+
+        <div class="battle-log" id="battleLog"></div>
+
+        <div style="margin-top:12px; display:flex; gap:8px; justify-content:flex-end;">
+          <button class="ghost" onclick="runAway()">Run</button>
+          <button class="green" id="nextBtn" onclick="nextQuestion()" style="display:none;">Next</button>
+          <button class="gold" id="returnBtn" onclick="closeBattle()" style="display:none;">Return</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="packModal" class="modal">
+  <div class="modal-card">
+    <h2>Bronze Battle Pack</h2>
+    <div class="small">You opened 5 cards.</div>
+    <div class="pack-results" id="packResults"></div>
+    <br>
+    <button class="gold" onclick="closePack()">Close</button>
+  </div>
+</div>
+
+<script>
+const monsters = {
+  Flamink: { emoji: "🔥🦊", hp: 100, atk: 18, def: 3, type: "Fire" },
+  Aquabbit: { emoji: "💧🐰", hp: 115, atk: 14, def: 6, type: "Water" },
+  Leafling: { emoji: "🌿🦎", hp: 108, atk: 15, def: 4, type: "Nature" }
+};
+
+const wilds = [
+  { name: "Sparkit", emoji: "⚡🐱", hp: 62, atk: 12, def: 2, xp: 26, coins: 18 },
+  { name: "Bookbug", emoji: "📘🐞", hp: 58, atk: 10, def: 3, xp: 24, coins: 16 },
+  { name: "Owlite", emoji: "🦉✨", hp: 72, atk: 13, def: 4, xp: 31, coins: 22 },
+  { name: "Vocabee", emoji: "🐝📚", hp: 64, atk: 14, def: 2, xp: 34, coins: 25 }
+];
+
+const cards = {
+  "Quick Strike": { cost: 1, rarity: "Common", text: "Deal 15 damage.", effect: "damage", power: 15 },
+  "Shield": { cost: 1, rarity: "Common", text: "Block 15 damage.", effect: "shield", power: 15 },
+  "Leaf Heal": { cost: 2, rarity: "Common", text: "Heal 25 HP.", effect: "heal", power: 25 },
+  "Word Spark": { cost: 2, rarity: "Uncommon", text: "Deal 20 damage. +10 in Vocabulary.", effect: "word", power: 20 },
+  "Double Damage": { cost: 3, rarity: "Rare", text: "Next correct answer hits twice.", effect: "double", power: 2 },
+  "Fire Blast": { cost: 3, rarity: "Rare", text: "Deal 38 damage.", effect: "damage", power: 38 },
+  "Knowledge Surge": { cost: 4, rarity: "Epic", text: "Gain 3 energy and draw 2.", effect: "surge", power: 3 },
+  "Legend Beam": { cost: 5, rarity: "Legendary", text: "Deal 75 damage.", effect: "damage", power: 75 }
+};
+
+const questions = [
+  { c:"Vocabulary", q:"Which word means very surprised?", a:["Scarce","Astonished","Tiny","Careless"], correct:1 },
+  { c:"Vocabulary", q:"What is a synonym for rapid?", a:["Fast","Quiet","Weak","Careful"], correct:0 },
+  { c:"Vocabulary", q:"What is an antonym of scarce?", a:["Rare","Abundant","Small","Hidden"], correct:1 },
+  { c:"Vocabulary", q:"Which word means using few words?", a:["Brief","Ancient","Furious","Fragile"], correct:0 },
+  { c:"Vocabulary", q:"The prefix bio- means:", a:["Sound","Life","Earth","Water"], correct:1 },
+  { c:"Vocabulary", q:"What does predict mean?", a:["Guess before","Erase","Measure","Run quickly"], correct:0 },
+  { c:"Vocabulary", q:"Which word means make better?", a:["Ignore","Improve","Scatter","Delay"], correct:1 },
+  { c:"Vocabulary", q:"What is a synonym for brave?", a:["Timid","Dull","Courageous","Careless"], correct:2 },
+  { c:"Math", q:"What is 8 × 7?", a:["54","56","63","49"], correct:1 },
+  { c:"Math", q:"What is 45 ÷ 5?", a:["7","8","9","10"], correct:2 },
+  { c:"Science", q:"Which planet is called the Red Planet?", a:["Venus","Mars","Jupiter","Mercury"], correct:1 },
+  { c:"Science", q:"Plants make food using:", a:["Photosynthesis","Magnetism","Friction","Evaporation"], correct:0 },
+  { c:"History", q:"Who was the first U.S. President?", a:["Lincoln","Washington","Jefferson","Adams"], correct:1 },
+  { c:"Geography", q:"What is the capital of France?", a:["Rome","Paris","Madrid","Berlin"], correct:1 },
+  { c:"Geography", q:"Largest ocean on Earth?", a:["Atlantic","Indian","Pacific","Arctic"], correct:2 }
+];
+
+const mapData = [
+  "TTTTTTWWTTTTTT",
+  "TGG..TWWTGGGGT",
+  "TG.L.PBBP.S.GT",
+  "TGG..PPPP...GT",
+  "T..IP....P..GT",
+  "T...P.AA.PGGGT",
+  "TGG.P.AA.PGGGT",
+  "TGG.PPPPPPGGGT",
+  "TG......PGGGGT",
+  "TTTTTTTTTTTTTT"
+];
+
+const tileClass = {
+  "T":"tree", ".":"grass", "P":"path", "G":"tall", "W":"water",
+  "B":"path", "L":"lab", "S":"shop", "A":"arena", "I":"sign"
+};
+
+let state = {
+  started:false,
+  starter:null,
+  x:2,
+  y:7,
+  level:1,
+  xp:0,
+  coins:60,
+  packs:1,
+  hp:100,
+  maxHp:100,
+  wins:0,
+  bestChain:0,
+  deck:["Quick Strike","Quick Strike","Shield","Leaf Heal","Word Spark"],
+  log:["Welcome to Oakridge Village."]
+};
+
+let battle = null;
+
+function save() {
+  localStorage.setItem("quizmon-arena-save", JSON.stringify(state));
+}
+
+function load() {
+  const raw = localStorage.getItem("quizmon-arena-save");
+  if (!raw) return false;
+  state = JSON.parse(raw);
+  return true;
+}
+
+function show(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  if (id === "game") {
+    renderMap();
+    updateUI();
+  }
+}
+
+function startNew() {
+  show("starter");
+}
+
+function continueGame() {
+  if (load()) show("game");
+  else alert("No save yet. Start a new game.");
+}
+
+function resetSave() {
+  localStorage.removeItem("quizmon-arena-save");
+  location.reload();
+}
+
+function quickBattle() {
+  if (!state.started) chooseStarter("Flamink", true);
+  startBattle();
+}
+
+function chooseStarter(name, skipScreen=false) {
+  const mon = monsters[name];
+  state.started = true;
+  state.starter = name;
+  state.hp = mon.hp;
+  state.maxHp = mon.hp;
+  if (name === "Flamink") state.deck.push("Fire Blast");
+  if (name === "Aquabbit") state.deck.push("Shield");
+  if (name === "Leafling") state.deck.push("Leaf Heal");
+  state.log.push(`${name} joined your party.`);
+  save();
+  if (!skipScreen) show("game");
+}
+
+function renderMap() {
+  const map = document.getElementById("map");
+  map.innerHTML = "";
+
+  for (let y=0; y<mapData.length; y++) {
+    for (let x=0; x<mapData[y].length; x++) {
+      const char = mapData[y][x];
+      const div = document.createElement("div");
+      div.className = "tile " + tileClass[char];
+
+      if (x === state.x && y === state.y) {
+        const p = document.createElement("div");
+        p.className = "player";
+        p.textContent = "🧢";
+        div.appendChild(p);
+      }
+
+      map.appendChild(div);
+    }
+  }
+
+  updateLocation();
+}
+
+function updateLocation() {
+  const char = mapData[state.y][state.x];
+  let name = "Oakridge Village";
+  let hint = "Use arrow keys or WASD. Press E to interact.";
+
+  if (char === "G") {
+    name = "Knowledge Forest — Tall Grass";
+    hint = "Wild QuizMons can appear here.";
+  }
+  if (char === "L") {
+    name = "Professor Lex's Lab";
+    hint = "Press E to heal.";
+  }
+  if (char === "S") {
+    name = "Pack Shop";
+    hint = "Press E to buy or open packs.";
+  }
+  if (char === "A") {
+    name = "Training Arena";
+    hint = "Press E to start a battle.";
+  }
+  if (char === "I") {
+    name = "Signpost";
+    hint = "Press E to read the sign.";
+  }
+
+  document.getElementById("locationName").textContent = name;
+  document.getElementById("locationHint").textContent = hint;
+}
+
+function updateUI() {
+  const mon = monsters[state.starter] || monsters.Flamink;
+  document.getElementById("levelText").textContent = `Lv. ${state.level}`;
+  document.getElementById("xpText").textContent = `XP ${state.xp} / ${xpNeed()}`;
+  document.getElementById("coinText").textContent = `Coins ${state.coins}`;
+  document.getElementById("packText").textContent = `Packs ${state.packs}`;
+  document.getElementById("chainText").textContent = `Best Chain ${state.bestChain}`;
+  document.getElementById("party").innerHTML = `
+    <div style="font-size:42px">${mon.emoji}</div>
+    <b>${state.starter}</b>
+    <div class="small">${mon.type} Type</div>
+    <div class="small">HP ${Math.round(state.hp)} / ${state.maxHp}</div>
+  `;
+  document.getElementById("deckText").innerHTML = `Deck: ${state.deck.length} cards<br>Wins: ${state.wins}`;
+  document.getElementById("log").innerHTML = state.log.slice(-8).map(x => `<div>${x}</div>`).join("");
+}
+
+function xpNeed() {
+  return 100 + (state.level - 1) * 50;
+}
+
+function addXp(n) {
+  state.xp += n;
+  while (state.xp >= xpNeed()) {
+    state.xp -= xpNeed();
+    state.level++;
+    state.maxHp += 10;
+    state.hp = state.maxHp;
+    state.packs++;
+    state.log.push(`Level up! You reached Lv. ${state.level} and earned a pack.`);
+  }
+}
+
+function canWalk(x,y) {
+  const char = mapData[y]?.[x];
+  return char && char !== "T" && char !== "W";
+}
+
+function move(dx,dy) {
+  if (battle) return;
+  const nx = state.x + dx;
+  const ny = state.y + dy;
+  if (!canWalk(nx,ny)) return;
+
+  state.x = nx;
+  state.y = ny;
+  renderMap();
+  save();
+
+  if (mapData[ny][nx] === "G" && Math.random() < .25) {
+    startBattle();
+  }
+}
+
+document.addEventListener("keydown", e => {
+  const k = e.key.toLowerCase();
+  if (k === "arrowup" || k === "w") move(0,-1);
+  if (k === "arrowdown" || k === "s") move(0,1);
+  if (k === "arrowleft" || k === "a") move(-1,0);
+  if (k === "arrowright" || k === "d") move(1,0);
+  if (k === "e" || k === "enter" || k === " ") interact();
+});
+
+function interact() {
+  const char = mapData[state.y][state.x];
+
+  if (char === "L") {
+    heal();
+    state.log.push("Professor Lex healed your QuizMon.");
+  } else if (char === "S") {
+    if (state.packs > 0) openPack();
+    else buyPack();
+  } else if (char === "A") {
+    startBattle();
+  } else if (char === "I") {
+    state.log.push("Sign: Win battles by answering questions. Open packs to get stronger cards.");
+  } else if (char === "G") {
+    startBattle();
+  } else {
+    state.log.push("Nothing special here.");
+  }
+
+  updateUI();
+  save();
+}
+
+function heal() {
+  state.hp = state.maxHp;
+  updateUI();
+  save();
+}
+
+function randomEnemy() {
+  const base = wilds[Math.floor(Math.random()*wilds.length)];
+  const level = Math.max(2, state.level + Math.floor(Math.random()*3));
+  const scale = 1 + (level - 1) * .12;
+  return {
+    ...base,
+    level,
+    maxHp: Math.round(base.hp * scale),
+    hp: Math.round(base.hp * scale),
+    atk: Math.round(base.atk * scale),
+    def: Math.round(base.def * scale),
+    xp: Math.round(base.xp * scale),
+    coins: Math.round(base.coins * scale)
+  };
+}
+
+function drawHand() {
+  const hand = [];
+  for (let i=0; i<3; i++) {
+    hand.push(state.deck[Math.floor(Math.random()*state.deck.length)]);
+  }
+  return hand;
+}
+
+function startBattle(enemy=null, category=null) {
+  const mon = monsters[state.starter] || monsters.Flamink;
+  battle = {
+    enemy: enemy || randomEnemy(),
+    hp: state.hp,
+    maxHp: state.maxHp,
+    energy: 2,
+    shield: 0,
+    chain: 0,
+    doubleNext: false,
+    hand: drawHand(),
+    category,
+    question:null,
+    answered:false,
+    log:[]
+  };
+
+  document.getElementById("battleModal").classList.add("active");
+  document.getElementById("playerSprite").textContent = mon.emoji;
+  document.getElementById("enemySprite").textContent = battle.enemy.emoji;
+  document.getElementById("returnBtn").style.display = "none";
+  document.getElementById("nextBtn").style.display = "none";
+
+  nextQuestion();
+  renderBattle();
+}
+
+function pickQuestion() {
+  let pool = questions;
+  if (battle.category) pool = questions.filter(q => q.c === battle.category);
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+
+function nextQuestion() {
+  battle.question = pickQuestion();
+  battle.answered = false;
+  document.getElementById("nextBtn").style.display = "none";
+  renderBattle();
+}
+
+function renderBattle() {
+  const mon = monsters[state.starter] || monsters.Flamink;
+  const e = battle.enemy;
+
+  document.getElementById("enemyName").textContent = `${e.name} Lv. ${e.level}`;
+  document.getElementById("enemyHp").style.width = `${Math.max(0, e.hp/e.maxHp*100)}%`;
+  document.getElementById("enemyHpText").textContent = `HP ${Math.max(0, Math.round(e.hp))} / ${e.maxHp}`;
+
+  document.getElementById("playerName").textContent = `${state.starter} Lv. ${state.level}`;
+  document.getElementById("playerHp").style.width = `${Math.max(0, battle.hp/battle.maxHp*100)}%`;
+  document.getElementById("energyBar").style.width = `${Math.min(100, battle.energy/8*100)}%`;
+  document.getElementById("playerHpText").textContent = `HP ${Math.max(0, Math.round(battle.hp))} / ${battle.maxHp} · Energy ${battle.energy}/8`;
+
+  const q = battle.question;
+  document.getElementById("questionMeta").textContent = `${q.c} · Knowledge Chain x${battle.chain}`;
+  document.getElementById("questionText").textContent = q.q;
+
+  document.getElementById("answers").innerHTML = q.a.map((a,i) => `
+    <button class="answer" onclick="answer(${i})"><b>${String.fromCharCode(65+i)})</b> ${a}</button>
+  `).join("");
+
+  document.getElementById("hand").innerHTML = battle.hand.map((name,i) => {
+    const c = cards[name];
+    return `
+      <button class="battle-card" onclick="playCard(${i})" ${battle.energy < c.cost ? "disabled" : ""}>
+        <b>${name}</b>
+        <div class="small">${c.rarity}</div>
+        <div class="small">Cost ${c.cost}</div>
+        <div class="small">${c.text}</div>
+      </button>
+    `;
+  }).join("");
+
+  document.getElementById("battleLog").innerHTML = battle.log.slice(-7).map(x => `<div>${x}</div>`).join("");
+}
+
+function answer(i) {
+  if (battle.answered) return;
+  battle.answered = true;
+
+  const q = battle.question;
+  const buttons = document.querySelectorAll(".answer");
+
+  buttons.forEach((btn, index) => {
+    btn.disabled = true;
+    if (index === q.correct) btn.classList.add("correct");
+    if (index === i && i !== q.correct) btn.classList.add("wrong");
+  });
+
+  if (i === q.correct) {
+    battle.chain++;
+    state.bestChain = Math.max(state.bestChain, battle.chain);
+    battle.energy = Math.min(8, battle.energy + 2);
+
+    let damage = monAttack() + battle.chain * 2;
+    if (battle.doubleNext) {
+      damage *= 2;
+      battle.doubleNext = false;
+    }
+
+    battle.enemy.hp -= damage;
+    battle.log.push(`Correct! You dealt ${damage} damage.`);
+
+    if (state.starter === "Aquabbit" && battle.chain % 2 === 0) {
+      battle.hp = Math.min(battle.maxHp, battle.hp + 8);
+      battle.log.push("Aquabbit healed 8 HP.");
+    }
+
+    if (state.starter === "Leafling" && q.c === "Vocabulary") {
+      battle.hp = Math.min(battle.maxHp, battle.hp + 10);
+      battle.log.push("Leafling healed 10 HP from vocabulary power.");
+    }
+
+    if (battle.enemy.hp <= 0) return winBattle();
+
+  } else {
+    battle.chain = 0;
+    battle.log.push(`Wrong. Correct answer: ${q.a[q.correct]}.`);
+    enemyAttack();
+  }
+
+  document.getElementById("nextBtn").style.display = "inline-block";
+  renderBattle();
+}
+
+function monAttack() {
+  const mon = monsters[state.starter] || monsters.Flamink;
+  let dmg = mon.atk + state.level * 2;
+  if (state.starter === "Flamink" && battle.chain >= 3) dmg += 7;
+  return Math.max(1, Math.round(dmg - battle.enemy.def));
+}
+
+function enemyAttack() {
+  const mon = monsters[state.starter] || monsters.Flamink;
+  let dmg = Math.max(1, battle.enemy.atk - mon.def);
+
+  if (battle.shield > 0) {
+    const block = Math.min(battle.shield, dmg);
+    battle.shield -= block;
+    dmg -= block;
+    battle.log.push(`Shield blocked ${block} damage.`);
+  }
+
+  if (dmg > 0) {
+    battle.hp -= dmg;
+    battle.log.push(`${battle.enemy.name} hit you for ${dmg}.`);
+  }
+
+  if (battle.hp <= 0) loseBattle();
+}
+
+function playCard(i) {
+  const name = battle.hand[i];
+  const card = cards[name];
+  if (!card || battle.energy < card.cost || battle.answered) return;
+
+  battle.energy -= card.cost;
+  battle.hand.splice(i,1);
+  battle.hand.push(state.deck[Math.floor(Math.random()*state.deck.length)]);
+
+  if (card.effect === "damage") {
+    battle.enemy.hp -= card.power;
+    battle.log.push(`${name} dealt ${card.power} damage.`);
+  }
+
+  if (card.effect === "shield") {
+    battle.shield += card.power;
+    battle.log.push(`${name} added ${card.power} shield.`);
+  }
+
+  if (card.effect === "heal") {
+    battle.hp = Math.min(battle.maxHp, battle.hp + card.power);
+    battle.log.push(`${name} healed ${card.power} HP.`);
+  }
+
+  if (card.effect === "word") {
+    let dmg = card.power;
+    if (battle.question.c === "Vocabulary") dmg += 10;
+    battle.enemy.hp -= dmg;
+    battle.log.push(`${name} dealt ${dmg} damage.`);
+  }
+
+  if (card.effect === "double") {
+    battle.doubleNext = true;
+    battle.log.push("Next correct answer will deal double damage.");
+  }
+
+  if (card.effect === "surge") {
+    battle.energy = Math.min(8, battle.energy + 3);
+    battle.hand.push(...drawHand().slice(0,2));
+    battle.log.push("Knowledge Surge restored energy and drew cards.");
+  }
+
+  if (battle.enemy.hp <= 0) return winBattle();
+
+  renderBattle();
+}
+
+function winBattle() {
+  const e = battle.enemy;
+  const xp = e.xp + battle.chain * 3;
+  const coins = e.coins + battle.chain * 2;
+
+  addXp(xp);
+  state.coins += coins;
+  state.wins++;
+  state.hp = Math.max(1, Math.round(battle.hp));
+
+  if (battle.chain >= 5) {
+    state.packs++;
+    state.log.push("Knowledge Chain bonus: earned a Bronze Pack.");
+  }
+
+  state.log.push(`Defeated ${e.name}. Earned ${xp} XP and ${coins} coins.`);
+  battle.log.push(`Victory! +${xp} XP, +${coins} coins.`);
+
+  finishBattle();
+}
+
+function loseBattle() {
+  state.hp = Math.round(state.maxHp * .5);
+  state.coins = Math.max(0, state.coins - 10);
+  state.log.push("You lost the battle and dropped 10 coins.");
+  battle.log.push("Defeat. Visit the lab to heal.");
+
+  finishBattle();
+}
+
+function finishBattle() {
+  save();
+  updateUI();
+  document.getElementById("nextBtn").style.display = "none";
+  document.getElementById("returnBtn").style.display = "inline-block";
+  renderBattle();
+}
+
+function runAway() {
+  state.hp = Math.max(1, Math.round(battle.hp));
+  state.log.push("You ran from battle.");
+  closeBattle();
+}
+
+function closeBattle() {
+  battle = null;
+  document.getElementById("battleModal").classList.remove("active");
+  renderMap();
+  updateUI();
+  save();
+}
+
+function buyPack() {
+  if (state.coins < 75) {
+    state.log.push("Not enough coins. Bronze Packs cost 75.");
+    updateUI();
+    return;
+  }
+
+  state.coins -= 75;
+  state.packs++;
+  state.log.push("Bought a Bronze Pack.");
+  updateUI();
+  save();
+}
+
+function openPack() {
+  if (state.packs <= 0) {
+    state.log.push("No packs available.");
+    updateUI();
+    return;
+  }
+
+  state.packs--;
+
+  const pool = [
+    "Quick Strike","Quick Strike","Shield","Leaf Heal",
+    "Word Spark","Word Spark","Double Damage",
+    "Fire Blast","Knowledge Surge","Legend Beam"
+  ];
+
+  const opened = [];
+  for (let i=0; i<5; i++) {
+    let name = pool[Math.floor(Math.random()*pool.length)];
+    opened.push(name);
+    state.deck.push(name);
+  }
+
+  document.getElementById("packResults").innerHTML = opened.map(name => {
+    const c = cards[name];
+    return `
+      <div class="pack-card">
+        <b>${name}</b>
+        <div class="small">${c.rarity}</div>
+        <br>
+        <div class="small">${c.text}</div>
+      </div>
+    `;
+  }).join("");
+
+  document.getElementById("packModal").classList.add("active");
+  state.log.push(`Opened pack: ${opened.join(", ")}.`);
+  updateUI();
+  save();
+}
+
+function closePack() {
+  document.getElementById("packModal").classList.remove("active");
+}
+
+if (load()) {
+  updateUI();
+}
+</script>
+
+</body>
+</html>
