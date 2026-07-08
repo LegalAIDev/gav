@@ -1,8 +1,9 @@
 # Asset manifest — replacement tracker
 
 All image/audio assets under `public/assets/images` and `public/assets/audio`
-are **Monster Tamer development placeholders** (gitignored, fetched via
-`npm run fetch-assets`). They are **not licensed for us to ship**. Replace each
+are **Monster Tamer development placeholders** (committed to the repo; also
+re-fetchable via `npm run fetch-assets`). They are **not licensed for us to
+ship**. Replace each
 category with our own licensed assets before production, keeping the same file
 paths/keys (defined in `src/scenes/preload-scene.js`), then tick the box.
 
