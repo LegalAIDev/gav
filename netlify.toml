@@ -1,0 +1,14 @@
+# Netlify deploy config.
+#
+# Without this, Netlify publishes the repository root as-is: it serves the raw
+# `src/` ES modules and `index.html`, but every runtime asset request to
+# `/assets/...` 404s, because those files live under `public/assets/...` and are
+# only exposed at `/assets/...` by Vite (its `publicDir`). The missing data
+# files then crash preload (`animations.json` -> undefined.forEach).
+#
+# Building with Vite fixes this: `vite build` bundles `src/` and copies
+# `public/*` into `dist/`, so `dist/assets/...` serves both the app bundle and
+# every image/audio/data/font at the `/assets/...` paths the game requests.
+[build]
+  command = "npm run build"
+  publish = "dist"
