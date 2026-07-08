@@ -1,0 +1,55 @@
+{
+  "main_1": [
+    {
+      "id": 1,
+      "x": 704,
+      "y": 4608,
+      "label": "Battle Basics",
+      "title": "How QuizMon Battles Work",
+      "pages": [
+        "In a battle, answering IS attacking. Pick a move, then answer the quiz question that appears.",
+        "A correct answer lands your attack. A wrong answer, or letting the timer run out, makes the attack miss.",
+        "Answer FAST for a speed bonus, and chain correct answers to build a streak - both make your hits stronger.",
+        "Tip: if a fight is going badly you can FLEE from the menu. Retreating almost always works now."
+      ]
+    },
+    {
+      "id": 2,
+      "x": 704,
+      "y": 4736,
+      "label": "Science & Geography",
+      "title": "Study Hall: Science & Geography",
+      "pages": [
+        "SCIENCE: Water is made of hydrogen and oxygen (H2O). Plants make food from sunlight through photosynthesis.",
+        "SCIENCE: The Sun is a star. Earth is the third planet from the Sun, and the Moon orbits the Earth.",
+        "GEOGRAPHY: The seven continents are Africa, Antarctica, Asia, Europe, North America, Oceania and South America.",
+        "GEOGRAPHY: Mount Everest is the tallest mountain, and the Nile and Amazon are among the longest rivers."
+      ]
+    },
+    {
+      "id": 3,
+      "x": 704,
+      "y": 4864,
+      "label": "Math & Vocabulary",
+      "title": "Study Hall: Math & Vocabulary",
+      "pages": [
+        "MATH: Remember order of operations - do brackets and multiplication/division before addition/subtraction.",
+        "MATH: A prime number has exactly two factors: 1 and itself (2, 3, 5, 7, 11...). Practice your times tables!",
+        "VOCABULARY: Synonyms mean the same thing (big / large); antonyms mean the opposite (hot / cold).",
+        "VOCABULARY: Learn common prefixes - 're-' means again, 'un-' means not, 'pre-' means before."
+      ]
+    },
+    {
+      "id": 4,
+      "x": 704,
+      "y": 4992,
+      "label": "History",
+      "title": "Study Hall: History",
+      "pages": [
+        "HISTORY: Events are ordered on a timeline. 'BCE' counts down toward year 1; 'CE' counts up after it.",
+        "HISTORY: Ancient civilisations like Egypt, Greece and Rome shaped writing, government and science.",
+        "HISTORY: When you read a question, look for date clues and famous names to narrow down the answer."
+      ]
+    }
+  ]
+}

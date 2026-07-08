@@ -119,4 +119,17 @@ export class DataUtils {
     const data = scene.cache.json.get(DATA_ASSET_KEYS.QUESTIONS);
     return data;
   }
+
+  /**
+   * Utility function for retrieving the educational "study stand" definitions for a
+   * given overworld area from the study_stands.json data file.
+   * @param {Phaser.Scene} scene the Phaser 3 Scene to get cached JSON file from
+   * @param {string} area the overworld area key (e.g. "main_1")
+   * @returns {import('../types/typedef.js').StudyStand[]}
+   */
+  static getStudyStandsForArea(scene, area) {
+    /** @type {Object.<string, import('../types/typedef.js').StudyStand[]>} */
+    const data = scene.cache.json.get(DATA_ASSET_KEYS.STUDY_STANDS) || {};
+    return data[area] || [];
+  }
 }
