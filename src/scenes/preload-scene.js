@@ -43,6 +43,7 @@ export class PreloadScene extends BaseScene {
     const pimenAssetPath = 'assets/images/pimen';
     const axulArtAssetPath = 'assets/images/axulart';
     const pbGamesAssetPath = 'assets/images/parabellum-games';
+    const quizmonAssetPath = 'assets/images/quizmon';
 
     // external social links assets
     if (SHOW_SOCIAL_LINKS) {
@@ -106,12 +107,22 @@ export class PreloadScene extends BaseScene {
       `${kenneysAssetPath}/ui-space-expansion/barHorizontal_shadow_left.png`
     );
 
-    // monster assets
-    this.load.image(MONSTER_ASSET_KEYS.CARNODUSK, `${monsterTamerAssetPath}/monsters/carnodusk.png`);
-    this.load.image(MONSTER_ASSET_KEYS.IGUANIGNITE, `${monsterTamerAssetPath}/monsters/iguanignite.png`);
-    this.load.image(MONSTER_ASSET_KEYS.AQUAVALOR, `${monsterTamerAssetPath}/monsters/aquavalor.png`);
-    this.load.image(MONSTER_ASSET_KEYS.FROSTSABER, `${monsterTamerAssetPath}/monsters/frostsaber.png`);
-    this.load.image(MONSTER_ASSET_KEYS.IGNIVOLT, `${monsterTamerAssetPath}/monsters/ignivolt.png`);
+    // monster assets — QuizMon roster extracted from the ChatGPT concept sheet
+    this.load.image(MONSTER_ASSET_KEYS.NOXINI, `${quizmonAssetPath}/monsters/noxini.png`);
+    this.load.image(MONSTER_ASSET_KEYS.PUFFLOAT, `${quizmonAssetPath}/monsters/puffloat.png`);
+    this.load.image(MONSTER_ASSET_KEYS.LULLUM, `${quizmonAssetPath}/monsters/lullum.png`);
+    this.load.image(MONSTER_ASSET_KEYS.SOMNIX, `${quizmonAssetPath}/monsters/somnix.png`);
+    this.load.image(MONSTER_ASSET_KEYS.STELLOR, `${quizmonAssetPath}/monsters/stellor.png`);
+    this.load.image(MONSTER_ASSET_KEYS.FLASHBACK, `${quizmonAssetPath}/monsters/flashback.png`);
+    this.load.image(MONSTER_ASSET_KEYS.REMINIX, `${quizmonAssetPath}/monsters/reminix.png`);
+    this.load.image(MONSTER_ASSET_KEYS.ECHOLET, `${quizmonAssetPath}/monsters/echolet.png`);
+    this.load.image(MONSTER_ASSET_KEYS.TILTIDE, `${quizmonAssetPath}/monsters/tiltide.png`);
+    this.load.image(MONSTER_ASSET_KEYS.CHRONYLE, `${quizmonAssetPath}/monsters/chronyle.png`);
+    this.load.image(MONSTER_ASSET_KEYS.GLIMMER, `${quizmonAssetPath}/monsters/glimmer.png`);
+    this.load.image(MONSTER_ASSET_KEYS.RUNELL, `${quizmonAssetPath}/monsters/runell.png`);
+    this.load.image(MONSTER_ASSET_KEYS.CLARITYN, `${quizmonAssetPath}/monsters/clarityn.png`);
+    this.load.image(MONSTER_ASSET_KEYS.LUCIDRA, `${quizmonAssetPath}/monsters/lucidra.png`);
+    this.load.image(MONSTER_ASSET_KEYS.SAGEVIA, `${quizmonAssetPath}/monsters/sagevia.png`);
 
     // ui assets
     this.load.image(UI_ASSET_KEYS.CURSOR, `${monsterTamerAssetPath}/ui/cursor.png`);

@@ -2,27 +2,31 @@
   {
     "id": "1",
     "monsterId": 1,
-    "name": "iguanignite",
-    "assetKey": "IGUANIGNITE",
+    "name": "Noxini",
+    "assetKey": "NOXINI",
     "assetFrame": 0,
     "currentHp": 25,
     "maxHp": 25,
-    "attackIds": [2],
+    "attackIds": [
+      1
+    ],
     "baseAttack": 5,
     "currentAttack": 5,
     "currentLevel": 5,
-    "baseExp": 50,
+    "baseExp": 51,
     "currentExp": 125
   },
   {
     "id": "2",
     "monsterId": 2,
-    "name": "carnodusk",
-    "assetKey": "CARNODUSK",
+    "name": "Puffloat",
+    "assetKey": "PUFFLOAT",
     "assetFrame": 0,
     "currentHp": 25,
     "maxHp": 25,
-    "attackIds": [1],
+    "attackIds": [
+      2
+    ],
     "baseAttack": 5,
     "currentAttack": 5,
     "currentLevel": 5,
@@ -32,42 +36,14 @@
   {
     "id": "3",
     "monsterId": 3,
-    "name": "ignivolt",
-    "assetKey": "IGNIVOLT",
+    "name": "Lullum",
+    "assetKey": "LULLUM",
     "assetFrame": 0,
     "currentHp": 25,
     "maxHp": 25,
-    "attackIds": [2],
-    "baseAttack": 5,
-    "currentAttack": 5,
-    "currentLevel": 5,
-    "baseExp": 51,
-    "currentExp": 125
-  },
-  {
-    "id": "4",
-    "monsterId": 4,
-    "name": "aquavalor",
-    "assetKey": "AQUAVALOR",
-    "assetFrame": 0,
-    "currentHp": 25,
-    "maxHp": 25,
-    "attackIds": [2],
-    "baseAttack": 5,
-    "currentAttack": 5,
-    "currentLevel": 5,
-    "baseExp": 50,
-    "currentExp": 125
-  },
-  {
-    "id": "5",
-    "monsterId": 5,
-    "name": "frostsaber",
-    "assetKey": "FROSTSABER",
-    "assetFrame": 0,
-    "currentHp": 25,
-    "maxHp": 25,
-    "attackIds": [1],
+    "attackIds": [
+      1
+    ],
     "baseAttack": 5,
     "currentAttack": 5,
     "currentLevel": 5,
@@ -75,33 +51,207 @@
     "currentExp": 125
   },
   {
-    "id": "6",
-    "monsterId": 3,
-    "name": "ignivolt",
-    "assetKey": "IGNIVOLT",
+    "id": "4",
+    "monsterId": 4,
+    "name": "Somnix",
+    "assetKey": "SOMNIX",
     "assetFrame": 0,
-    "currentHp": 15,
-    "maxHp": 15,
-    "attackIds": [2],
-    "baseAttack": 3,
-    "currentAttack": 3,
-    "currentLevel": 3,
-    "baseExp": 40,
-    "currentExp": 27
+    "currentHp": 25,
+    "maxHp": 25,
+    "attackIds": [
+      2
+    ],
+    "baseAttack": 5,
+    "currentAttack": 5,
+    "currentLevel": 5,
+    "baseExp": 54,
+    "currentExp": 125
+  },
+  {
+    "id": "5",
+    "monsterId": 5,
+    "name": "Stellor",
+    "assetKey": "STELLOR",
+    "assetFrame": 0,
+    "currentHp": 25,
+    "maxHp": 25,
+    "attackIds": [
+      1
+    ],
+    "baseAttack": 5,
+    "currentAttack": 5,
+    "currentLevel": 5,
+    "baseExp": 55,
+    "currentExp": 125
+  },
+  {
+    "id": "6",
+    "monsterId": 6,
+    "name": "Flashback",
+    "assetKey": "FLASHBACK",
+    "assetFrame": 0,
+    "currentHp": 20,
+    "maxHp": 20,
+    "attackIds": [
+      2
+    ],
+    "baseAttack": 4,
+    "currentAttack": 4,
+    "currentLevel": 4,
+    "baseExp": 56,
+    "currentExp": 60
   },
   {
     "id": "7",
-    "monsterId": 2,
-    "name": "carnodusk",
-    "assetKey": "CARNODUSK",
+    "monsterId": 7,
+    "name": "Reminix",
+    "assetKey": "REMINIX",
     "assetFrame": 0,
-    "currentHp": 15,
-    "maxHp": 15,
-    "attackIds": [1],
-    "baseAttack": 3,
-    "currentAttack": 3,
-    "currentLevel": 3,
-    "baseExp": 41,
-    "currentExp": 27
+    "currentHp": 20,
+    "maxHp": 20,
+    "attackIds": [
+      1
+    ],
+    "baseAttack": 4,
+    "currentAttack": 4,
+    "currentLevel": 4,
+    "baseExp": 57,
+    "currentExp": 60
+  },
+  {
+    "id": "8",
+    "monsterId": 8,
+    "name": "Echolet",
+    "assetKey": "ECHOLET",
+    "assetFrame": 0,
+    "currentHp": 25,
+    "maxHp": 25,
+    "attackIds": [
+      2
+    ],
+    "baseAttack": 5,
+    "currentAttack": 5,
+    "currentLevel": 5,
+    "baseExp": 58,
+    "currentExp": 125
+  },
+  {
+    "id": "9",
+    "monsterId": 9,
+    "name": "Tiltide",
+    "assetKey": "TILTIDE",
+    "assetFrame": 0,
+    "currentHp": 25,
+    "maxHp": 25,
+    "attackIds": [
+      1
+    ],
+    "baseAttack": 5,
+    "currentAttack": 5,
+    "currentLevel": 5,
+    "baseExp": 59,
+    "currentExp": 125
+  },
+  {
+    "id": "10",
+    "monsterId": 10,
+    "name": "Chronyle",
+    "assetKey": "CHRONYLE",
+    "assetFrame": 0,
+    "currentHp": 25,
+    "maxHp": 25,
+    "attackIds": [
+      2
+    ],
+    "baseAttack": 5,
+    "currentAttack": 5,
+    "currentLevel": 5,
+    "baseExp": 60,
+    "currentExp": 125
+  },
+  {
+    "id": "11",
+    "monsterId": 11,
+    "name": "Glimmer",
+    "assetKey": "GLIMMER",
+    "assetFrame": 0,
+    "currentHp": 25,
+    "maxHp": 25,
+    "attackIds": [
+      1
+    ],
+    "baseAttack": 5,
+    "currentAttack": 5,
+    "currentLevel": 5,
+    "baseExp": 61,
+    "currentExp": 125
+  },
+  {
+    "id": "12",
+    "monsterId": 12,
+    "name": "Runell",
+    "assetKey": "RUNELL",
+    "assetFrame": 0,
+    "currentHp": 25,
+    "maxHp": 25,
+    "attackIds": [
+      2
+    ],
+    "baseAttack": 5,
+    "currentAttack": 5,
+    "currentLevel": 5,
+    "baseExp": 62,
+    "currentExp": 125
+  },
+  {
+    "id": "13",
+    "monsterId": 13,
+    "name": "Clarityn",
+    "assetKey": "CLARITYN",
+    "assetFrame": 0,
+    "currentHp": 25,
+    "maxHp": 25,
+    "attackIds": [
+      1
+    ],
+    "baseAttack": 5,
+    "currentAttack": 5,
+    "currentLevel": 5,
+    "baseExp": 63,
+    "currentExp": 125
+  },
+  {
+    "id": "14",
+    "monsterId": 14,
+    "name": "Lucidra",
+    "assetKey": "LUCIDRA",
+    "assetFrame": 0,
+    "currentHp": 25,
+    "maxHp": 25,
+    "attackIds": [
+      2
+    ],
+    "baseAttack": 5,
+    "currentAttack": 5,
+    "currentLevel": 5,
+    "baseExp": 64,
+    "currentExp": 125
+  },
+  {
+    "id": "15",
+    "monsterId": 15,
+    "name": "Sagevia",
+    "assetKey": "SAGEVIA",
+    "assetFrame": 0,
+    "currentHp": 25,
+    "maxHp": 25,
+    "attackIds": [
+      1
+    ],
+    "baseAttack": 5,
+    "currentAttack": 5,
+    "currentLevel": 5,
+    "baseExp": 65,
+    "currentExp": 125
   }
 ]
