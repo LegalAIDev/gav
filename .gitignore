@@ -4,10 +4,9 @@ node_modules/
 # build output
 dist/
 
-# fetched dev-only assets (Monster Tamer art/audio — NOT redistributed).
-# Pulled by `npm run fetch-assets`. Replace with your own before production.
-public/assets/images/
-public/assets/audio/
+# Image/audio assets now live in the repo under public/assets/{images,audio}
+# (committed). `npm run fetch-assets` remains available to (re)populate them
+# from the Monster Tamer release if they're ever missing.
 .asset-cache/
 
 # editor / OS
