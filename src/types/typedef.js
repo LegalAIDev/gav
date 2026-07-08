@@ -362,3 +362,15 @@ export const ENCOUNTER_TILE_TYPE = Object.freeze({
  * @typedef SignData
  * @type {Object.<string, SignDetails>}
  */
+
+/** Study Stand Data */
+/**
+ * @typedef StudyStand
+ * @type {object}
+ * @property {number} id
+ * @property {number} x tile top-left x position (pixels) the stand occupies in the world
+ * @property {number} y tile top-left y position (pixels) the stand occupies in the world
+ * @property {string} label short caption rendered on the stand in the overworld
+ * @property {string} title heading shown at the top of the study modal
+ * @property {string[]} pages the educational content, shown one page at a time
+ */

@@ -791,8 +791,9 @@ export class BattleScene extends BaseScene {
     this.#battleStateMachine.addState({
       name: BATTLE_STATES.FLEE_ATTEMPT,
       onEnter: () => {
+        // fleeing succeeds ~80% of the time so retreating is a reliable option
         const randomNumber = Phaser.Math.Between(1, 10);
-        if (randomNumber > 5) {
+        if (randomNumber > 2) {
           // player has run away successfully
           this.#showMessagesAndWaitForInput(['You got away safely!'], () => {
             this.time.delayedCall(200, () => {

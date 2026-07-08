@@ -100,11 +100,6 @@ export class BattleMenu {
     this.#createMonsterAttackSubMenu();
     this.#createPlayerInputCursor();
 
-    // Conditionally disable FLEE button
-    if (this.#isTrainerBattle) {
-      /** @type {Phaser.GameObjects.Text} */ (this.#mainBattleMenuPhaserContainerGameObject.getAt(4)).setAlpha(0.5);
-    }
-
     this.#scene.events.on(Phaser.Scenes.Events.RESUME, this.#handleSceneResume, this);
     this.#scene.events.once(
       Phaser.Scenes.Events.SHUTDOWN,
@@ -713,13 +708,6 @@ export class BattleMenu {
     }
 
     if (this.#selectedBattleMenuOption === BATTLE_MENU_OPTIONS.FLEE) {
-      if (this.#isTrainerBattle) {
-        this.updateInfoPaneMessagesAndWaitForInput(["You can't flee at this time!"], () => {
-          this.showMainBattleMenu();
-        });
-        return;
-      }
-
       this.#activeBattleMenu = ACTIVE_BATTLE_MENU.BATTLE_FLEE;
       this.#fleeAttempt = true;
       return;

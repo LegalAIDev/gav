@@ -60,6 +60,7 @@ export const DATA_ASSET_KEYS = Object.freeze({
   EVENTS: 'EVENTS',
   SIGNS: 'SIGNS',
   QUESTIONS: 'QUESTIONS',
+  STUDY_STANDS: 'STUDY_STANDS',
 });
 
 export const ATTACK_ASSET_KEYS = Object.freeze({

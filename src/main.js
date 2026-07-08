@@ -10,6 +10,7 @@ import { MonsterDetailsScene } from './scenes/monster-details-scene.js';
 import { InventoryScene } from './scenes/inventory-scene.js';
 import { CutsceneScene } from './scenes/cutscene-scene.js';
 import { DialogScene } from './scenes/dialog-scene.js';
+import { StudyModalScene } from './scenes/study-modal-scene.js';
 
 const game = new Phaser.Game({
   type: Phaser.CANVAS,
@@ -34,4 +35,5 @@ game.scene.add(SCENE_KEYS.MONSTER_DETAILS_SCENE, MonsterDetailsScene);
 game.scene.add(SCENE_KEYS.INVENTORY_SCENE, InventoryScene);
 game.scene.add(SCENE_KEYS.CUTSCENE_SCENE, CutsceneScene);
 game.scene.add(SCENE_KEYS.DIALOG_SCENE, DialogScene);
+game.scene.add(SCENE_KEYS.STUDY_MODAL_SCENE, StudyModalScene);
 game.scene.start(SCENE_KEYS.PRELOAD_SCENE);

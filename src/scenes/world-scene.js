@@ -53,6 +53,8 @@ export class WorldScene extends BaseScene {
   #wildMonsterEncountered;
   /** @type {Phaser.Tilemaps.ObjectLayer | undefined} */
   #signLayer;
+  /** @type {import('../types/typedef.js').StudyStand[]} */
+  #studyStands;
   /** @type {DialogScene} */
   #dialogUi;
   /** @type {NPC[]} */
@@ -149,7 +151,11 @@ export class WorldScene extends BaseScene {
         x: reviveLocation.x,
         y: reviveLocation.y - TILE_SIZE,
       });
-      dataManager.store.set(DATA_MANAGER_STORE_KEYS.PLAYER_DIRECTION, DIRECTION.UP);
+      // Face the player away from the revive-location NPC (the healer stands directly
+      // above this tile). The player is auto-healed on arrival, and mashing the confirm
+      // button to dismiss that message would otherwise re-trigger the healer's
+      // rest/heal/fade sequence over and over, so we face them toward the room instead.
+      dataManager.store.set(DATA_MANAGER_STORE_KEYS.PLAYER_DIRECTION, DIRECTION.DOWN);
     }
 
     // During a new game flow, find the players starting location from the map data, and update
@@ -250,6 +256,9 @@ export class WorldScene extends BaseScene {
     // create npcs
     this.#createNPCs(map);
 
+    // create educational study stands for this area
+    this.#createStudyStands();
+
     // create player and have camera focus on the player
     this.#player = new Player({
       scene: this,
@@ -263,7 +272,11 @@ export class WorldScene extends BaseScene {
         this.#handlePlayerDirectionUpdate();
       },
       otherCharactersToCheckForCollisionsWith: this.#npcs,
-      objectsToCheckForCollisionsWith: this.#items,
+      // study stands are solid so the player turns to face them (like signs) instead of walking through
+      objectsToCheckForCollisionsWith: [
+        ...this.#items,
+        ...this.#studyStands.map((stand) => ({ position: { x: stand.x, y: stand.y } })),
+      ],
       entranceLayer: this.#entranceLayer,
       enterEntranceCallback: (entranceName, entranceId, isBuildingEntrance) => {
         this.#handleEntranceEnteredCallback(entranceName, entranceId, isBuildingEntrance);
@@ -483,6 +496,23 @@ export class WorldScene extends BaseScene {
       return;
     }
 
+    // check for an educational study stand and open its modal of prep content
+    const nearbyStand = this.#studyStands.find((stand) => {
+      return stand.x === targetPosition.x && stand.y === targetPosition.y;
+    });
+    if (nearbyStand) {
+      this._controls.lockInput = true;
+      /** @type {import('./study-modal-scene.js').StudyModalSceneData} */
+      const sceneDataToPass = {
+        previousSceneName: SCENE_KEYS.WORLD_SCENE,
+        title: nearbyStand.title,
+        pages: nearbyStand.pages,
+      };
+      this.scene.launch(SCENE_KEYS.STUDY_MODAL_SCENE, sceneDataToPass);
+      this.scene.pause(SCENE_KEYS.WORLD_SCENE);
+      return;
+    }
+
     const nearbyNpc = this.#npcs.find((npc) => {
       return npc.sprite.x === targetPosition.x && npc.sprite.y === targetPosition.y;
     });
@@ -598,7 +628,7 @@ export class WorldScene extends BaseScene {
     }
     console.log(`[${WorldScene.name}:handlePlayerMovementInEncounterZone] player is in an encounter zone`);
 
-    this.#wildMonsterEncountered = Math.random() < 0.2;
+    this.#wildMonsterEncountered = Math.random() < 0.08;
     if (this.#wildMonsterEncountered) {
       const encounterAreaId = /** @type {import('../types/typedef.js').TiledObjectProperty[]} */ (
         this.#encounterZonePlayerIsEntering.layer.properties
@@ -629,6 +659,27 @@ export class WorldScene extends BaseScene {
       this.#isProcessingNpcEvent ||
       this.#currentCutSceneId !== undefined
     );
+  }
+
+  /**
+   * Builds the educational "study stands" for the current area. Each stand looks
+   * like a plain sign post; interacting with it opens a larger modal of prep
+   * content (see {@link #handlePlayerInteraction}).
+   * @returns {void}
+   */
+  #createStudyStands() {
+    this.#studyStands = DataUtils.getStudyStandsForArea(this, this.#sceneData.area) || [];
+
+    this.#studyStands.forEach((stand) => {
+      // board sits within the stand's tile (tiles are TILE_SIZE px, origin top-left)
+      const board = this.add.rectangle(stand.x + 12, stand.y + 20, 40, 30, 0xf5e0a0).setOrigin(0);
+      board.setStrokeStyle(4, 0x7a4a1e, 1);
+      // a couple of "text lines" drawn on the board so it reads as a notice board
+      this.add.rectangle(stand.x + 18, stand.y + 27, 28, 3, 0x7a4a1e, 0.8).setOrigin(0);
+      this.add.rectangle(stand.x + 18, stand.y + 34, 28, 3, 0x7a4a1e, 0.8).setOrigin(0);
+      // supporting post
+      this.add.rectangle(stand.x + 28, stand.y + 50, 8, 12, 0x7a4a1e).setOrigin(0);
+    });
   }
 
   /**
