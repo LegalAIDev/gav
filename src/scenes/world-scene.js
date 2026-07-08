@@ -149,7 +149,11 @@ export class WorldScene extends BaseScene {
         x: reviveLocation.x,
         y: reviveLocation.y - TILE_SIZE,
       });
-      dataManager.store.set(DATA_MANAGER_STORE_KEYS.PLAYER_DIRECTION, DIRECTION.UP);
+      // Face the player away from the revive-location NPC (the healer stands directly
+      // above this tile). The player is auto-healed on arrival, and mashing the confirm
+      // button to dismiss that message would otherwise re-trigger the healer's
+      // rest/heal/fade sequence over and over, so we face them toward the room instead.
+      dataManager.store.set(DATA_MANAGER_STORE_KEYS.PLAYER_DIRECTION, DIRECTION.DOWN);
     }
 
     // During a new game flow, find the players starting location from the map data, and update
