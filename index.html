@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- viewport locked for mobile: no zoom, no scroll, fills the screen -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#000000" />
+    <title>QuizMon Overworld</title>
+    <style>
+      html,
+      body,
+      #game-container {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+        background: #000000;
+        overscroll-behavior: none;
+        touch-action: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      @font-face {
+        font-family: Kenney-Future-Narrow;
+        src: url('/assets/fonts/kenneys-fonts/Kenney-Future-Narrow.ttf') format('truetype');
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container" id="game-container"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
