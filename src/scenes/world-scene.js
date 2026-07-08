@@ -11,7 +11,6 @@ import {
   getTargetPositionFromGameObjectPositionAndDirection,
 } from '../utils/grid-utils.js';
 import { CANNOT_READ_SIGN_TEXT, SAMPLE_TEXT } from '../utils/text-utils.js';
-import { KENNEY_FUTURE_NARROW_FONT_NAME } from '../assets/font-keys.js';
 import { NPC, NPC_MOVEMENT_PATTERN } from '../world/characters/npc.js';
 import { WorldMenu } from '../world/world-menu.js';
 import { BaseScene } from './base-scene.js';
@@ -663,9 +662,9 @@ export class WorldScene extends BaseScene {
   }
 
   /**
-   * Builds the educational "study stands" for the current area. Each stand is a
-   * small visible board with a topic caption; interacting with it opens a larger
-   * modal of prep content (see {@link #handlePlayerInteraction}).
+   * Builds the educational "study stands" for the current area. Each stand looks
+   * like a plain sign post; interacting with it opens a larger modal of prep
+   * content (see {@link #handlePlayerInteraction}).
    * @returns {void}
    */
   #createStudyStands() {
@@ -680,19 +679,6 @@ export class WorldScene extends BaseScene {
       this.add.rectangle(stand.x + 18, stand.y + 34, 28, 3, 0x7a4a1e, 0.8).setOrigin(0);
       // supporting post
       this.add.rectangle(stand.x + 28, stand.y + 50, 8, 12, 0x7a4a1e).setOrigin(0);
-
-      // topic caption floating above the board
-      const caption = this.add
-        .text(stand.x + TILE_SIZE / 2, stand.y - 2, stand.label, {
-          fontFamily: KENNEY_FUTURE_NARROW_FONT_NAME,
-          color: '#ffffff',
-          fontSize: '18px',
-          align: 'center',
-          backgroundColor: '#00000088',
-        })
-        .setOrigin(0.5, 1)
-        .setPadding(4, 2, 4, 2);
-      caption.setDepth(1);
     });
   }
 
