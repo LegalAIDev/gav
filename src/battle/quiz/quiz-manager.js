@@ -23,7 +23,6 @@ import { DataUtils } from '../../utils/data-utils.js';
 
 // Tuning knobs for how answers translate into combat.
 const STREAK_BONUS_PER = 0.15; // extra damage multiplier per streak level
-const SPEED_BONUS_MAX = 0.5; // extra multiplier for answering instantly
 const MAX_MULTIPLIER = 3;
 
 /**
@@ -90,12 +89,11 @@ export class QuizManager {
    * Resolve the player's answer into a combat result.
    * @param {object} args
    * @param {QuizQuestion} args.question
-   * @param {number} args.chosenIndex   the option the player picked (-1 on timeout)
+   * @param {number} args.chosenIndex   the option the player picked (-1 if none)
    * @param {number} args.baseAttack     the active monster's attack stat
-   * @param {number} args.timeFraction   fraction of the timer remaining (0-1); rewards speed
    * @returns {QuizResult}
    */
-  resolveAnswer({ question, chosenIndex, baseAttack, timeFraction }) {
+  resolveAnswer({ question, chosenIndex, baseAttack }) {
     const correct = chosenIndex === question.correct;
 
     if (!correct) {
@@ -104,11 +102,7 @@ export class QuizManager {
     }
 
     this.#streak += 1;
-    const clampedTime = Phaser.Math.Clamp(timeFraction, 0, 1);
-    const multiplier = Math.min(
-      MAX_MULTIPLIER,
-      1 + STREAK_BONUS_PER * (this.#streak - 1) + SPEED_BONUS_MAX * clampedTime
-    );
+    const multiplier = Math.min(MAX_MULTIPLIER, 1 + STREAK_BONUS_PER * (this.#streak - 1));
     const damage = Math.max(1, Math.round(baseAttack * multiplier));
     return { correct: true, correctIndex: question.correct, damage, multiplier, streak: this.#streak };
   }

@@ -17,14 +17,13 @@ const COLOR = {
   correctBorder: 0x7be0a0,
   wrongFill: 0x7d2e2e,
   wrongBorder: 0xe08a8a,
-  timer: 0x64d0ff,
-  timerDanger: 0xff6b6b,
 };
 
 /**
  * Phaser-native quiz panel shown during the player's battle turn. Renders the
  * question, four answer options (navigable with the joystick/arrows + confirm,
- * or tappable directly), a countdown bar, and correct/wrong feedback.
+ * or tappable directly), and correct/wrong feedback. There is no time limit —
+ * the player can take as long as they like to answer.
  *
  * The panel reads input state through the battle scene (which already merges
  * keyboard + touch via the Controls class), so it works on desktop and mobile.
@@ -38,8 +37,6 @@ export class QuizUI {
   #questionText;
   /** @type {Phaser.GameObjects.Text} */
   #metaText;
-  /** @type {Phaser.GameObjects.Rectangle} */
-  #timerFill;
   /** @type {Phaser.GameObjects.Rectangle[]} */
   #optionRects;
   /** @type {Phaser.GameObjects.Text[]} */
@@ -98,16 +95,6 @@ export class QuizUI {
       .setOrigin(0.5, 0);
     this.#container.add(this.#questionText);
 
-    // countdown bar
-    const timerBg = scene.add
-      .rectangle(32, PANEL.y + 78, PANEL.width - 64, 8, 0x000000, 0.4)
-      .setOrigin(0, 0.5);
-    this.#timerFill = scene.add
-      .rectangle(32, PANEL.y + 78, PANEL.width - 64, 8, COLOR.timer, 1)
-      .setOrigin(0, 0.5);
-    this.#container.add(timerBg);
-    this.#container.add(this.#timerFill);
-
     // four option boxes in a 2x2 grid
     for (let i = 0; i < 4; i++) {
       const x = COL_X[i % 2];
@@ -157,7 +144,6 @@ export class QuizUI {
       this.#optionLabels[i].setText(`${i + 1})  ${answer}`);
       this.#optionRects[i].setFillStyle(COLOR.optionFill, 0.95).setStrokeStyle(2, COLOR.optionBorder);
     });
-    this.setTimerFraction(1);
     this.#setSelected(0);
     this.#container.setVisible(true);
   }
@@ -186,18 +172,10 @@ export class QuizUI {
     });
   }
 
-  /** @param {number} fraction 0-1 of time remaining */
-  setTimerFraction(fraction) {
-    const clamped = Phaser.Math.Clamp(fraction, 0, 1);
-    // the fill is full-width with a left origin, so scaleX shrinks it from the right
-    this.#timerFill.scaleX = clamped;
-    this.#timerFill.setFillStyle(clamped < 0.33 ? COLOR.timerDanger : COLOR.timer, 1);
-  }
-
   /**
    * Lock input and color the correct answer (and the wrong pick, if any).
    * @param {number} correctIndex
-   * @param {number} chosenIndex -1 on timeout
+   * @param {number} chosenIndex -1 if no answer was chosen
    */
   reveal(correctIndex, chosenIndex) {
     this.#locked = true;
