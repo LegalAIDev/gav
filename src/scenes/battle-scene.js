@@ -119,12 +119,6 @@ export class BattleScene extends BaseScene {
   #quizOutcome;
   /** @type {boolean} */
   #quizAwaitingAnswer;
-  /** @type {Phaser.Time.TimerEvent | undefined} */
-  #quizTimerEvent;
-  /** @type {number} */
-  #quizTimeLeft;
-  /** @type {number} */
-  #quizTimeMax;
 
   constructor() {
     super({
@@ -335,7 +329,7 @@ export class BattleScene extends BaseScene {
       return;
     }
 
-    // a wrong answer / timeout makes the attack fizzle and deal no damage
+    // a wrong answer makes the attack fizzle and deal no damage
     if (this.#quizOutcome && !this.#quizOutcome.correct) {
       this.#battleMenu.updateInfoPaneMessageNoInputRequired(
         `${this.#activePlayerMonster.name} lost focus and the attack missed!`,
@@ -379,40 +373,9 @@ export class BattleScene extends BaseScene {
   }
 
   /**
-   * Start (or restart) the per-question countdown. Running out of time counts
-   * as a wrong answer.
-   * @returns {void}
-   */
-  #startQuizTimer() {
-    this.#quizTimeMax = 15;
-    this.#quizTimeLeft = this.#quizTimeMax;
-    this.#stopQuizTimer();
-    this.#quizUi.setTimerFraction(1);
-    this.#quizTimerEvent = this.time.addEvent({
-      delay: 100,
-      loop: true,
-      callback: () => {
-        this.#quizTimeLeft = Math.max(0, this.#quizTimeLeft - 0.1);
-        this.#quizUi.setTimerFraction(this.#quizTimeLeft / this.#quizTimeMax);
-        if (this.#quizTimeLeft <= 0) {
-          this.#submitQuizAnswer(-1);
-        }
-      },
-    });
-  }
-
-  /** @returns {void} */
-  #stopQuizTimer() {
-    if (this.#quizTimerEvent) {
-      this.#quizTimerEvent.remove(false);
-      this.#quizTimerEvent = undefined;
-    }
-  }
-
-  /**
    * Resolve the chosen answer into a combat outcome, show feedback, then hand
    * off to the normal battle sequence.
-   * @param {number} chosenIndex the option picked, or -1 on timeout
+   * @param {number} chosenIndex the option picked
    * @returns {void}
    */
   #submitQuizAnswer(chosenIndex) {
@@ -420,14 +383,11 @@ export class BattleScene extends BaseScene {
       return;
     }
     this.#quizAwaitingAnswer = false;
-    this.#stopQuizTimer();
 
-    const timeFraction = this.#quizTimeMax > 0 ? this.#quizTimeLeft / this.#quizTimeMax : 0;
     this.#quizOutcome = this.#quizManager.resolveAnswer({
       question: this.#currentQuestion,
       chosenIndex,
       baseAttack: this.#activePlayerMonster.baseAttack,
-      timeFraction,
     });
 
     this.#quizUi.reveal(this.#quizOutcome.correctIndex, chosenIndex);
@@ -689,7 +649,7 @@ export class BattleScene extends BaseScene {
 
     // The player has committed to attacking with the selected move; they must
     // now answer a quiz question to land it. A correct answer powers the attack
-    // (streak + speed bonus); a wrong answer or timeout makes it fizzle.
+    // (streak bonus); a wrong answer makes it fizzle.
     this.#battleStateMachine.addState({
       name: BATTLE_STATES.PLAYER_QUIZ,
       onEnter: () => {
@@ -700,7 +660,6 @@ export class BattleScene extends BaseScene {
         this.#quizUi.show(this.#currentQuestion, { streak: this.#quizManager.streak }, (index) =>
           this.#submitQuizAnswer(index)
         );
-        this.#startQuizTimer();
       },
     });
 
