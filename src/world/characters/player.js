@@ -41,6 +41,8 @@ export class Player extends Character {
     });
     this.#entranceLayer = config.entranceLayer;
     this.#enterEntranceCallback = config.enterEntranceCallback;
+    // player walks noticeably faster than the default 600ms/tile
+    this._walkDuration = 400;
   }
 
   /**
@@ -62,7 +64,8 @@ export class Player extends Character {
         ) {
           this._phaserGameObject.play(`PLAYER_${this._direction}`);
         }
-        this._phaserGameObject.anims.timeScale = this._isRunning ? 2 : 1;
+        // keep the walk cycle in sync with the faster movement (600ms is the base step)
+        this._phaserGameObject.anims.timeScale = this._isRunning ? 2 : 600 / this._walkDuration;
         break;
       case DIRECTION.NONE:
         break;

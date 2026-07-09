@@ -81,8 +81,11 @@ Follow-ups / tuning:
       `pickQuestion({ category })` already supports it; wire area → category.
 - [ ] Tune timer (15s), streak/speed multipliers in `quiz-manager.js`.
 - [ ] Optional: port the legacy **energy/cards** layer for extra depth.
-- [ ] Replace Monster Tamer's monsters (`public/assets/data/monsters.json`,
-      `encounters.json`) with QuizMon's own roster.
+- [x] Replace Monster Tamer's monsters (`public/assets/data/monsters.json`,
+      `encounters.json`) with QuizMon's own roster — 15 creatures extracted from
+      the ChatGPT concept sheet to transparent PNGs under
+      `public/assets/images/quizmon/monsters/`, grouped into three encounter
+      routes (Dream Sprites / Memory Echoes / Insight Wisps).
 
 ### 3. Make the world ours
 - [ ] Edit maps in [Tiled](https://www.mapeditor.org/); tilemaps are

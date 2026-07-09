@@ -10,7 +10,7 @@ paths/keys (defined in `src/scenes/preload-scene.js`), then tick the box.
 ## Images  (`public/assets/images/`)
 | category | path prefix | original source | replaced? |
 |---|---|---|---|
-| Monsters | `monster-tamer/monsters/` | Monster Tamer | ☐ |
+| Monsters | `quizmon/monsters/` | QuizMon (extracted from ChatGPT concept sheet) | ☑ |
 | Battle backgrounds | `monster-tamer/battle-backgrounds/` | Monster Tamer | ☐ |
 | Battle (balls, trainers) | `monster-tamer/battle/` | Monster Tamer | ☐ |
 | Map: tilesets/levels | `monster-tamer/map/` | AxulArt | ☐ |
