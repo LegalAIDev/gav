@@ -25,19 +25,23 @@ const BUTTON = Object.freeze({
   CONFIRM: 'CONFIRM',
   BACK: 'BACK',
   INTERACT: 'INTERACT',
+  MENU: 'MENU',
 });
 
 const RADIUS = 54; // px of thumb travel from the stick origin
 const DEADZONE = 16; // px before a direction registers
+const RUN_THRESHOLD = 46; // pushing the stick past this (near the RADIUS edge) runs
 
 class TouchInput {
   #initialized = false;
   #heldDirection = DIRECTION.NONE;
   #justPressedDirection = DIRECTION.NONE;
+  /** @type {boolean} true while the stick is pushed to its outer edge (run) */
+  #running = false;
   /** @type {Record<string, boolean>} buttons currently held */
-  #buttonDown = { CONFIRM: false, BACK: false, INTERACT: false };
+  #buttonDown = { CONFIRM: false, BACK: false, INTERACT: false, MENU: false };
   /** @type {Record<string, boolean>} edge-triggered "was pressed", consumed on read */
-  #buttonPressed = { CONFIRM: false, BACK: false, INTERACT: false };
+  #buttonPressed = { CONFIRM: false, BACK: false, INTERACT: false, MENU: false };
 
   /** @type {HTMLElement | undefined} */
   #base;
@@ -58,11 +62,17 @@ class TouchInput {
     this.#buildStyles(isTouch);
     this.#buildJoystick(isTouch);
     this.#buildButtons();
+    this.#buildMenuButton();
   }
 
   /** @returns {import('../common/direction.js').Direction} currently held direction */
   getDirection() {
     return this.#heldDirection;
+  }
+
+  /** @returns {boolean} true while the movement stick is pushed to its edge (run) */
+  isRunning() {
+    return this.#running;
   }
 
   /**
@@ -113,6 +123,9 @@ class TouchInput {
       this.#thumb.style.transform = `translate(${dx}px, ${dy}px)`;
     }
 
+    // pushing the stick to its outer edge runs, mirroring hold-Shift on keyboard
+    this.#running = dist >= RUN_THRESHOLD;
+
     if (dist < DEADZONE) {
       this.#setDirection(DIRECTION.NONE);
       return;
@@ -127,6 +140,7 @@ class TouchInput {
 
   #release() {
     this.#activePointer = null;
+    this.#running = false;
     if (this.#thumb) {
       this.#thumb.style.transform = 'translate(0px, 0px)';
     }
@@ -200,6 +214,19 @@ class TouchInput {
       .tb-a { right: 0; bottom: 52px; background: rgba(74,222,128,.42); }
       .tb-b { right: 92px; bottom: 8px; background: rgba(248,113,113,.42); }
       .tb-y { right: 52px; bottom: 104px; background: rgba(250,204,21,.42); }
+
+      /* Menu / Start button (opens the overworld save menu) — top-center. */
+      .tb-menu {
+        position: absolute; top: max(14px, env(safe-area-inset-top));
+        left: 50%; transform: translateX(-50%);
+        height: 44px; padding: 0 18px; border-radius: 22px;
+        display: flex; align-items: center; justify-content: center; gap: 7px;
+        font-weight: 800; font-size: 15px; letter-spacing: .04em; color: #fff;
+        pointer-events: auto; white-space: nowrap;
+        background: rgba(20,30,48,.55); border: 2px solid rgba(255,255,255,.42);
+        box-shadow: 0 2px 8px rgba(0,0,0,.35);
+      }
+      .tb-menu:active { filter: brightness(1.4); transform: translateX(-50%) scale(.95); }
       ${
         isTouch
           ? ''
@@ -321,6 +348,30 @@ class TouchInput {
     make('A', 'tb-a', BUTTON.CONFIRM);
     make('B', 'tb-b', BUTTON.BACK);
     make('Y', 'tb-y', BUTTON.INTERACT);
+  }
+
+  /**
+   * The Menu (Start) button opens the overworld save menu. It has its own input
+   * channel so it never collides with the A/confirm button the way the keyboard
+   * Enter key used to when both routed through CONFIRM.
+   */
+  #buildMenuButton() {
+    const overlay = this.#overlay();
+    const el = document.createElement('div');
+    el.className = 'tb-menu';
+    el.textContent = '☰ Menu';
+    el.addEventListener('pointerdown', (ev) => {
+      this.#buttonDown[BUTTON.MENU] = true;
+      this.#buttonPressed[BUTTON.MENU] = true;
+      ev.preventDefault();
+    });
+    const lift = () => {
+      this.#buttonDown[BUTTON.MENU] = false;
+    };
+    el.addEventListener('pointerup', lift);
+    el.addEventListener('pointercancel', lift);
+    el.addEventListener('pointerleave', lift);
+    overlay.appendChild(el);
   }
 
   #overlay() {

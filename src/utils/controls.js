@@ -41,7 +41,10 @@ export class Controls {
   /** @returns {boolean} */
   wasEnterKeyPressed() {
     const keyboard = this.#enterKey !== undefined && Phaser.Input.Keyboard.JustDown(this.#enterKey);
-    return keyboard || touchInput.consumeButtonPressed(TOUCH_BUTTON.CONFIRM);
+    // The on-screen Menu button has its own channel so it doesn't collide with
+    // the A/confirm button (both used to route through CONFIRM, which meant the
+    // overworld menu could never be opened by touch).
+    return keyboard || touchInput.consumeButtonPressed(TOUCH_BUTTON.MENU);
   }
 
   /** @returns {boolean} */
@@ -63,14 +66,13 @@ export class Controls {
   }
 
   /**
-   * Returns if the shift key is currently being held down.
+   * Returns whether the player is holding "run" — the keyboard shift key, or the
+   * touch movement stick pushed to its outer edge.
    * @returns {boolean}
    */
   isShiftKeyDown() {
-    if (this.#cursorKeys === undefined) {
-      return false;
-    }
-    return this.#cursorKeys.shift.isDown;
+    const keyboard = this.#cursorKeys !== undefined && this.#cursorKeys.shift.isDown;
+    return keyboard || touchInput.isRunning();
   }
 
   /** @returns {import('../common/direction.js').Direction} */
